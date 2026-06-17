@@ -1,76 +1,195 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benim Harika Sitem</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Muhammed Gazi | Kişisel Web Sitesi</title>
+    <!-- Tailwind CSS CDN (Hızlı ve Modern Tasarım İçin) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Poppins) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome İkonları -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Arka plandaki parlayan ışık efektleri için özel animasyon */
+        .glow-bg {
+            filter: blur(120px);
+            opacity: 0.15;
+            z-index: 0;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-[#0f172a] text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white overflow-x-hidden">
 
-    <header>
-        <div class="container">
-            <h1 class="logo">Benim Sitem</h1>
+    <!-- Arka Plan Parlama Efektleri -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600 rounded-full glow-bg pointer-events-none"></div>
+    <div class="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-purple-600 rounded-full glow-bg pointer-events-none"></div>
+
+    <!-- Navigasyon Barı (Sabit ve Yarı Şeffaf) -->
+    <header class="sticky top-0 z-50 bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent hover:scale-105 transition-transform">
+                MG <span class="text-indigo-400">.</span>
+            </a>
             <nav>
-                <ul>
-                    <li><a href="#about">Hakkımda</a></li>
-                    <li><a href="#projects">Projeler</a></li>
-                    <li><a href="#contact">İletişim</a></li>
+                <ul class="flex space-x-8 text-sm font-medium text-slate-300">
+                    <li><a href="#about" class="hover:text-indigo-400 transition-colors">Hakkımda</a></li>
+                    <li><a href="#projects" class="hover:text-indigo-400 transition-colors">Projelerim</a></li>
+                    <li><a href="#contact" class="hover:text-indigo-400 transition-colors">İletişim</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <section class="hero">
-        <div class="container hero-content">
-            <h2>Merhaba, Ben Muhammed gazi</h2>
-            <p>GitHub Pages üzerinde ücretsiz olarak oluşturduğum ilk web siteme hoş geldiniz! Burası benim dijital dünyam.</p>
-            <a href="#about" class="btn">Daha Fazla Bilgi</a>
-        </div>
-    </section>
-
-    <section id="about" class="container">
-        <h3>Hakkımda</h3>
-        <p>Burası kendinizi tanıtabileceğiniz, ilgi alanlarınızı ve yeteneklerinizi paylaşabileceğiniz bölümdür. Ne yapmaktan hoşlanırsınız? Hangi teknolojileri öğreniyorsunuz? Bu soruların cevaplarını buraya yazabilirsiniz.</p>
-    </section>
-
-    <section id="projects" class="container">
-        <h3>Projelerim</h3>
-        <div class="project-grid">
-            <div class="project-card">
-                <h4>Proje 1</h4>
-                <p>Bu projenin ne hakkında olduğunu kısaca açıklayın.</p>
-                <a href="#">Detaylar →</a>
-            </div>
-            <div class="project-card">
-                <h4>Proje 2</h4>
-                <p>Başka bir harika projenizin kısa özeti.</p>
-                <a href="#">Detaylar →</a>
-            </div>
-            <div class="project-card">
-                <h4>Proje 3</h4>
-                <p>En son üzerinde çalıştığınız proje.</p>
-                <a href="#">Detaylar →</a>
+    <!-- Ana Karşılama Ekranı (Hero) -->
+    <section class="relative min-h-[80vh] flex items-center justify-center px-6">
+        <div class="max-w-3xl text-center z-10">
+            <span class="inline-block px-4 py-1.5 bg-indigo-500/10 text-indigo-400 text-xs font-semibold rounded-full border border-indigo-500/20 mb-6">
+                Portfolyoma Hoş Geldiniz
+            </span>
+            <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
+                Merhaba, Ben <br>
+                <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Muhammed Gazi
+                </span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                GitHub Pages üzerinde oluşturduğum tamamen ücretsiz ve modern dijital dünyama hoş geldiniz. Teknolojiyle üretiyor, geliştiriyor ve öğreniyorum.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="#projects" class="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all shadow-lg shadow-indigo-600/30 text-center">
+                    Projelerimi Gör
+                </a>
+                <a href="#contact" class="w-full sm:w-auto px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition-all text-center">
+                    Bana Ulaşın
+                </a>
             </div>
         </div>
     </section>
 
-    <section id="contact" class="container">
-        <h3>İletişim</h3>
-        <p>Benimle iletişime geçmek için aşağıdaki yolları kullanabilirsiniz.</p>
-        <ul>
-            <li>E-posta: [muhammedgamer13x@gmail.com]</li>
-            <li>GitHub: <a href="[https://muhammedgamer13x-boop.github.io/]">[https://muhammedgamer13x-boop.github.io/]</a></li>
-            <li>LinkedIn: [linkedin profil linkiniz]</li>
-        </ul>
+    <!-- Hakkımda Bölümü -->
+    <section id="about" class="py-24 px-6 border-t border-slate-800/60 bg-slate-900/20 relative">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Hakkımda</h2>
+                <div class="h-1 w-16 bg-indigo-500 mx-auto rounded-full"></div>
+            </div>
+            <div class="grid md:grid-cols-5 gap-12 items-center">
+                <div class="md:col-span-2 flex justify-center">
+                    <div class="w-48 h-48 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white text-6xl shadow-2xl shadow-indigo-500/20">
+                        <i class="fa-solid fa-code-branch"></i>
+                    </div>
+                </div>
+                <div class="md:col-span-3 text-slate-300 space-y-6 text-lg">
+                    <p>
+                        Yazılıma, teknolojiye ve oyun dünyasına meraklı bir geliştiriciyim. Kendi fikirlerimi dijital dünyada hayata geçirmek için sürekli yeni teknolojiler öğreniyorum.
+                    </p>
+                    <p>
+                        Şu anda web geliştirme teknolojileri üzerinde çalışıyor ve GitHub üzerinde projelerimi yayınlıyorum. Amacım her zaman daha işlevsel ve estetik tasarımlar üretmek.
+                    </p>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 [Muhammed Gazi]. GitHub Pages ile Ücretsiz Web Sitesi.</p>
+    <!-- Projeler Bölümü -->
+    <section id="projects" class="py-24 px-6 border-t border-slate-800/60">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Projelerim</h2>
+                <div class="h-1 w-16 bg-indigo-500 mx-auto rounded-full"></div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Proje 1 -->
+                <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-8 hover:-translate-y-2 hover:border-indigo-500/50 transition-all group">
+                    <div class="w-12 h-12 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center text-xl mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Discord Oyun Botu</h3>
+                    <p class="text-slate-400 mb-6 leading-relaxed">Discord sunucuları için tasarlanmış, eğlenceli mini oyunlar içeren etkileşimli bir bot projesi.</p>
+                    <a href="https://github.com/muhammedgamer13x-boop" target="_blank" class="text-indigo-400 font-semibold inline-flex items-center gap-2 hover:text-indigo-300">
+                        GitHub'da Gör <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
+                </div>
+                <!-- Proje 2 -->
+                <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-8 hover:-translate-y-2 hover:border-indigo-500/50 transition-all group">
+                    <div class="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-xl flex items-center justify-center text-xl mb-6 group-hover:bg-purple-600 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-globe"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Kişisel Web Sitesi</h3>
+                    <p class="text-slate-400 mb-6 leading-relaxed">Tamamen ücretsiz olarak GitHub Pages üzerinde barındırılan, modern ve şık portfolyo tasarımı.</p>
+                    <a href="https://github.com/muhammedgamer13x-boop" target="_blank" class="text-purple-400 font-semibold inline-flex items-center gap-2 hover:text-purple-300">
+                        GitHub'da Gör <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
+                </div>
+                <!-- Proje 3 -->
+                <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-8 hover:-translate-y-2 hover:border-indigo-500/50 transition-all group">
+                    <div class="w-12 h-12 bg-pink-500/10 text-pink-400 rounded-xl flex items-center justify-center text-xl mb-6 group-hover:bg-pink-600 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Özelleştirilebilir Panel</h3>
+                    <p class="text-slate-400 mb-6 leading-relaxed">Kullanıcıların kendi arayüzlerini istedikleri gibi yönetebilmelerini sağlayan dinamik bir web paneli.</p>
+                    <a href="https://github.com/muhammedgamer13x-boop" target="_blank" class="text-pink-400 font-semibold inline-flex items-center gap-2 hover:text-pink-300">
+                        GitHub'da Gör <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- İletişim Bölümü -->
+    <section id="contact" class="py-24 px-6 border-t border-slate-800/60 bg-slate-900/10">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">İletişim</h2>
+                <p class="text-slate-400">Benimle her zaman aşağıdaki kanallardan bağlantı kurabilirsiniz.</p>
+                <div class="h-1 w-16 bg-indigo-500 mx-auto rounded-full mt-4"></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- E-posta Kartı -->
+                <a href="mailto:muhammedgamer13x@gmail.com" class="flex items-center p-6 bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-indigo-500/40 hover:bg-slate-900 transition-all gap-5 group">
+                    <div class="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center text-2xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                        <i class="fa-regular fa-envelope"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm text-slate-400">Bana E-posta Gönder</h4>
+                        <p class="text-base font-semibold text-slate-100 mt-1">muhammedgamer13x@gmail.com</p>
+                    </div>
+                </a>
+                <!-- GitHub Kartı -->
+                <a href="https://github.com/muhammedgamer13x-boop" target="_blank" class="flex items-center p-6 bg-slate-900/40 border border-slate-800 rounded-2xl hover:border-indigo-500/40 hover:bg-slate-900 transition-all gap-5 group">
+                    <div class="w-14 h-14 bg-slate-800 text-slate-200 rounded-xl flex items-center justify-center text-2xl group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                        <i class="fa-brands fa-github"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm text-slate-400">Profilimi İncele</h4>
+                        <p class="text-base font-semibold text-slate-100 mt-1">muhammedgamer13x-boop</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-slate-800/80 bg-slate-950 text-center text-slate-500 text-sm">
+        <div class="max-w-6xl mx-auto px-6 space-y-4">
+            <p>&copy; 2026 Muhammed Gazi. Tüm Hakları Saklıdır.</p>
+            <p class="text-xs">
+                Bu site tamamen ücretsiz bir şekilde <i class="fa-solid fa-heart text-red-500"></i> ve <a href="https://pages.github.com" target="_blank" class="text-indigo-400 hover:underline">GitHub Pages</a> ile oluşturulmuştur.
+            </p>
         </div>
     </footer>
 
