@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhammed Gazi | Portfolio & Air Draw</title>
+    <title>Muhammed Gazi | Portfolio, Games & Air Draw</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -172,6 +172,20 @@
             left: 30px;
             z-index: 999;
         }
+
+        /* --- ARCADE GAME CSS AYARLARI --- */
+        #game-view {
+            display: none; /* Başlangıçta gizli */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9998;
+            background-color: #020617;
+            overflow: hidden;
+            user-select: none;
+        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col justify-between">
@@ -230,7 +244,7 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
                 <!-- Air Draw Projesi (ÖZEL YAPAY ZEKA PROJEMİZ) -->
-                <div class="bg-gray-900 border-2 border-cyan-500/50 rounded-2xl p-6 shadow-xl shadow-cyan-500/10 flex flex-col justify-between group hover:border-cyan-400 transition-all duration-300">
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg hover:border-cyan-500/50 flex flex-col justify-between group transition-all duration-300">
                     <div>
                         <div class="w-12 h-12 bg-cyan-950 border border-cyan-400 rounded-xl flex items-center justify-center mb-4 text-cyan-400 text-xl shadow-md">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -246,32 +260,38 @@
                     </button>
                 </div>
 
-                <!-- Proje 2 -->
-                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-500/30 transition">
+                <!-- Proje 2 (HTML5 TUĞLA KIRMA OYUNU) -->
+                <div class="bg-gray-900 border-2 border-fuchsia-500/40 rounded-2xl p-6 shadow-lg hover:border-fuchsia-400 flex flex-col justify-between group transition-all duration-300 shadow-fuchsia-500/5">
                     <div>
-                        <div class="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center mb-4 text-gray-400 text-xl">
-                            <i class="fa-solid fa-robot"></i>
+                        <div class="w-12 h-12 bg-fuchsia-950 border border-fuchsia-400 rounded-xl flex items-center justify-center mb-4 text-fuchsia-400 text-xl shadow-md">
+                            <i class="fa-solid fa-ghost"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-2">Gamer Discord Bot</h3>
+                        <h3 class="text-xl font-bold mb-2 text-fuchsia-300">Cyber Breakout</h3>
                         <p class="text-gray-400 text-sm mb-6">
-                            Topluluk sunucuları için tasarlanmış, istatistik takibi yapan ve özel eğlence komutlarına sahip tam entegre bir Discord bot projesi.
+                            Tamamen tarayıcı üzerinden oynanabilen, neon tasarımlı, parçacık efektli ve lazer, geniş palet, çoklu top gibi özel güçlendiricilere sahip retro atari tuğla kırma oyunu!
                         </p>
                     </div>
-                    <span class="text-sm font-medium text-cyan-400">Yakında Gelecek...</span>
+                    <!-- Çalıştırma Butonu -->
+                    <button onclick="startArcadeGame()" class="w-full bg-fuchsia-500 hover:bg-fuchsia-600 text-gray-950 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-gamepad"></i> Oyunu Başlat
+                    </button>
                 </div>
 
-                <!-- Proje 3 -->
+                <!-- Proje 3 (PYTHON SES KONTROLÜ) -->
                 <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-500/30 transition">
                     <div>
-                        <div class="w-12 h-12 bg-gray-800 rounded-xl flex items-center justify-center mb-4 text-gray-400 text-xl">
-                            <i class="fa-solid fa-gamepad"></i>
+                        <div class="w-12 h-12 bg-blue-950 border border-blue-400 rounded-xl flex items-center justify-center mb-4 text-blue-400 text-xl">
+                            <i class="fa-brands fa-python"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-2">Mini 2D Platform Oyunu</h3>
+                        <h3 class="text-xl font-bold mb-2 text-cyan-300">AI Gesture Volume Control</h3>
                         <p class="text-gray-400 text-sm mb-6">
-                            JavaScript ve HTML5 Canvas kullanarak tarayıcı üzerinde oynanabilen retro tarzda eğlenceli bir macera platform oyunu.
+                            Python, OpenCV ve MediaPipe kullanarak el parmaklarınızın arasındaki mesafeye göre bilgisayarınızın ses seviyesini havadan kontrol eden akıllı Python yazılımı.
                         </p>
                     </div>
-                    <span class="text-sm font-medium text-cyan-400">Tasarım Aşamasında</span>
+                    <!-- Kodu İncele Butonu -->
+                    <button onclick="openPythonModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-code"></i> Python Kodunu Al
+                    </button>
                 </div>
 
             </div>
@@ -355,6 +375,163 @@
             <div class="spinner"></div>
             <h2 id="loader-text">JARVIS SİSTEMLERİ BAŞLATILIYOR...</h2>
             <p class="text-xs mt-2 opacity-80">Kamera İzni Bekleniyor ve AI Modülleri İndiriliyor (10-15 saniye sürebilir)</p>
+        </div>
+    </div>
+
+
+    <!-- ==================== ARCADE OYUN GÖRÜNÜMÜ ==================== -->
+    <div id="game-view" class="flex flex-col items-center justify-center">
+        <!-- Retro Arcade HUD Grid Arka Plan -->
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(244,63,94,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(244,63,94,0.04)_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col items-center w-full max-w-4xl p-4">
+            <!-- Arcade Header -->
+            <div class="w-full flex justify-between items-center mb-4 border-b-2 border-fuchsia-500/40 pb-3">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-gamepad text-3xl text-fuchsia-500 animate-pulse"></i>
+                    <h1 class="text-2xl font-black hud-font tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-pink-500">CYBER_BREAKOUT v1.0</h1>
+                </div>
+                <!-- Çıkış Butonu -->
+                <button onclick="stopArcadeGame()" class="border border-rose-500 text-rose-500 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-rose-500 hover:text-white transition flex items-center gap-2">
+                    <i class="fa-solid fa-circle-xmark"></i> OYUNDAN ÇIK
+                </button>
+            </div>
+
+            <!-- Oyun Tuvali (Canvas) -->
+            <div class="relative border-4 border-fuchsia-500/60 rounded-2xl overflow-hidden shadow-2xl shadow-fuchsia-500/20 bg-slate-950">
+                <canvas id="game-canvas" width="800" height="500" class="block max-w-full cursor-none"></canvas>
+            </div>
+
+            <!-- Oyun Alt Bilgisi / Kontroller -->
+            <div class="w-full flex flex-col md:flex-row justify-between items-center mt-4 text-xs font-semibold text-gray-400 bg-slate-900/50 p-4 border border-gray-800 rounded-xl gap-3">
+                <div class="flex items-center gap-4">
+                    <span class="flex items-center gap-1.5"><kbd class="bg-gray-800 px-2 py-0.5 rounded text-white border border-gray-700">FARE / PARMAK</kbd> Paleti Hareket Ettir</span>
+                    <span class="flex items-center gap-1.5"><kbd class="bg-gray-800 px-2 py-0.5 rounded text-white border border-gray-700">SOL TIK</kbd> Topu Fırlat / Lazer Ateşle</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-emerald-400 font-bold">🟢 Geniş Palet</span>
+                    <span class="text-rose-400 font-bold">🔴 Lazer Palet</span>
+                    <span class="text-purple-400 font-bold">🟣 Ekstra Top</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== PYTHON KOD MODAL SİSTEMİ ==================== -->
+    <div id="python-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[10000] hidden items-center justify-center p-4">
+        <div class="bg-gray-900 border border-cyan-500/50 rounded-2xl w-full max-w-3xl h-[80vh] flex flex-col overflow-hidden shadow-2xl shadow-cyan-500/20">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-950/50">
+                <div class="flex items-center gap-3">
+                    <i class="fa-brands fa-python text-2xl text-cyan-400"></i>
+                    <h2 class="text-xl font-bold text-gray-100">AI Gesture Volume Control (.py)</h2>
+                </div>
+                <button onclick="closePythonModal()" class="text-gray-400 hover:text-white transition text-2xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body (Code View) -->
+            <div class="p-6 flex-1 overflow-y-auto space-y-4">
+                <div class="bg-cyan-950/20 border border-cyan-800/40 rounded-xl p-4 text-xs text-cyan-300">
+                    <p class="font-bold mb-1">💡 Bu Program Nasıl Çalıştırılır?</p>
+                    <p>1. Bilgisayarınızda Python yüklü olmalıdır.<br>
+                    2. Terminale şu komutu yazarak gerekli kütüphaneleri yükleyin:<br>
+                    <code class="bg-gray-950 px-2 py-0.5 rounded text-white font-mono select-all">pip install opencv-python mediapipe pycaw numpy</code><br>
+                    3. Kodları bir dosyaya <code class="text-white">ses_kontrol.py</code> adıyla kaydedip çalıştırın!</p>
+                </div>
+
+                <!-- Code Container -->
+                <div class="relative">
+                    <button onclick="copyCode()" class="absolute top-3 right-3 bg-gray-800 hover:bg-cyan-500 hover:text-gray-950 text-gray-300 text-xs font-bold px-3 py-1.5 rounded transition flex items-center gap-1.5">
+                        <i class="fa-regular fa-copy"></i> <span id="copy-text">Kopyala</span>
+                    </button>
+                    <pre class="bg-gray-950 p-5 rounded-xl border border-gray-800 text-sm overflow-x-auto text-emerald-400 font-mono" id="python-code"><code>import cv2
+import mediapipe as mp
+import math
+import numpy as np
+from ctypes import cast, POINTER
+from comtypes import CLSCTX_ALL
+from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+
+# 1. Kamerayı ve MediaPipe El Algılayıcıyı Başlat
+cap = cv2.VideoCapture(0)
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
+mp_draw = mp.solutions.drawing_utils
+
+# 2. Bilgisayarın Ses Kartı Ayarlarına Bağlan (Windows için)
+devices = AudioUtilities.GetSpeakers()
+interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+volume = cast(interface, POINTER(IAudioEndpointVolume))
+vol_range = volume.GetVolumeRange() # [Min Ses, Max Ses]
+min_vol = vol_range[0]
+max_vol = vol_range[1]
+
+print("[SİSTEM] Yapay Zeka Ses Kontrolü Başlatıldı. Çıkış için 'q' basın.")
+
+while True:
+    success, img = cap.read()
+    if not success:
+        break
+        
+    img = cv2.flip(img, 1) # Aynalama
+    h, w, c = img.shape
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = hands.process(img_rgb)
+    
+    vol_bar = 400 # Varsayılan grafik bar yüksekliği
+    vol_per = 0   # Varsayılan yüzde seviyesi
+    
+    if results.multi_hand_landmarks:
+        for hand_lms in results.multi_hand_landmarks:
+            # El iskeletini çiz
+            mp_draw.draw_landmarks(img, hand_lms, mp_hands.HAND_CONNECTIONS)
+            
+            # Başparmak ucu (Landmark 4) ve İşaret parmağı ucu (Landmark 8) koordinatları
+            thumb = hand_lms.landmark[4]
+            index = hand_lms.landmark[8]
+            
+            tx, ty = int(thumb.x * w), int(thumb.y * h)
+            ix, iy = int(index.x * w), int(index.y * h)
+            
+            # Parmak uçlarına daire çiz ve aralarına çizgi çek
+            cv2.circle(img, (tx, ty), 10, (0, 240, 255), cv2.FILLED)
+            cv2.circle(img, (ix, iy), 10, (0, 240, 255), cv2.FILLED)
+            cv2.line(img, (tx, ty), (ix, iy), (0, 240, 255), 3)
+            
+            # İki parmak arasındaki mesafeyi ölç (Hipotenüs)
+            length = math.hypot(ix - tx, iy - ty)
+            
+            # Algılanan mesafeyi Python Ses Aralığına ve Yüzdeye dönüştür
+            # El mesafesi genelde 20px ile 200px arasındadır
+            vol = np.interp(length, [20, 200], [min_vol, max_vol])
+            vol_bar = np.interp(length, [20, 200], [400, 150])
+            vol_per = np.interp(length, [20, 200], [0, 100])
+            
+            # Bilgisayarın ses seviyesini güncelle
+            volume.SetMasterVolumeLevel(vol, None)
+            
+            # Eğer parmaklar çok yakınsa yeşil sinyal ver
+            if length < 25:
+                cv2.circle(img, ((tx + ix) // 2, (ty + iy) // 2), 10, (0, 255, 0), cv2.FILLED)
+
+    # Ekrana Görsel Ses Barları ve Grafikler Çiz
+    cv2.rectangle(img, (50, 150), (85, 400), (255, 0, 0), 3)
+    cv2.rectangle(img, (50, int(vol_bar)), (85, 400), (0, 240, 255), cv2.FILLED)
+    cv2.putText(img, f'{int(vol_per)} %', (40, 450), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 240, 255), 2)
+    
+    cv2.imshow("Muhammed Gazi - AI Ses Kontrolu", img)
+    
+    # Çıkış Kontrolü (Klavyeden 'q' harfine basılırsa)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()</code></pre>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -524,15 +701,11 @@
 
         // --- SISTEMI BAŞLAT (PORTFOLYODAN GEÇİŞ) ---
         function startAirDraw() {
-            // Portfolyo sayfasını gizle, Yapay zekayı göster
             document.getElementById('portfolio-view').classList.add('hidden');
             document.getElementById('airdraw-container').style.display = 'block';
             document.getElementById('loader').style.display = 'flex';
-            
-            // Yeniden boyutlandır
             resize();
 
-            // Kamerayı başlat
             if (!cameraInstance) {
                 cameraInstance = new Camera(video, {
                     onFrame: async () => { await hands.send({image: video}); },
@@ -548,26 +721,493 @@
 
         // --- SİSTEMİ KAPAT (PORTFOLYOYA DÖNÜŞ) ---
         function stopAirDraw() {
-            // Kamerayı tamamen durdur (Kamera donanım ışığı söner)
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(track => track.stop());
                 video.srcObject = null;
             }
             if (cameraInstance) {
-                cameraInstance = null; // Kamerayı kapat
+                cameraInstance = null;
             }
-
-            // Çizimleri temizle
             lines = [];
             moveOffset = {x: 0, y: 0};
 
-            // Görünüm Değiştir
             document.getElementById('airdraw-container').style.display = 'none';
             document.getElementById('portfolio-view').classList.remove('hidden');
 
-            // Varsa Tam Ekrandan Çık
             if (document.fullscreenElement) {
                 document.exitFullscreen();
+            }
+        }
+
+        // --- PYTHON MODEL AYARLARI ---
+        function openPythonModal() {
+            const modal = document.getElementById('python-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closePythonModal() {
+            const modal = document.getElementById('python-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function copyCode() {
+            const code = document.getElementById('python-code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const btnText = document.getElementById('copy-text');
+                btnText.innerText = "Kopyalandı!";
+                setTimeout(() => {
+                    btnText.innerText = "Kopyala";
+                }, 2000);
+            });
+        }
+
+
+        // ==========================================
+        //        HTML5 CANVASI RETRO ATARI OYUNU
+        // ==========================================
+        const gameCanvas = document.getElementById('game-canvas');
+        const gCtx = gameCanvas.getContext('2d');
+        let gameLoopId = null;
+        let gameActive = false;
+
+        // Oyun Ayarları
+        let bricks = [];
+        let particles = [];
+        let powerUps = [];
+        let balls = [];
+        let lasers = [];
+
+        const brickRows = 5;
+        const brickCols = 9;
+        const brickHeight = 25;
+        const brickGap = 6;
+        const brickWidth = (800 - (brickCols + 1) * brickGap) / brickCols;
+
+        // Palet Ayarları
+        let paddle = {
+            x: 350,
+            y: 460,
+            width: 110,
+            height: 15,
+            color: '#f43f5e',
+            speed: 8,
+            laserTimer: 0,
+            widthTimer: 0
+        };
+
+        // Tuğla Renkleri
+        const brickColors = ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6'];
+
+        // Oyunu Başlat
+        function startArcadeGame() {
+            document.getElementById('portfolio-view').classList.add('hidden');
+            document.getElementById('game-view').style.display = 'flex';
+            
+            initGame();
+            gameActive = true;
+            gameLoop();
+        }
+
+        // Oyundan Çık
+        function stopArcadeGame() {
+            gameActive = false;
+            cancelAnimationFrame(gameLoopId);
+            document.getElementById('game-view').style.display = 'none';
+            document.getElementById('portfolio-view').classList.remove('hidden');
+        }
+
+        // Oyun Değişkenlerini Sıfırla
+        let score = 0;
+        let lives = 3;
+        let level = 1;
+
+        function initGame() {
+            score = 0;
+            lives = 3;
+            level = 1;
+            paddle.x = 350;
+            paddle.width = 110;
+            paddle.laserTimer = 0;
+            paddle.widthTimer = 0;
+            balls = [{
+                x: 400,
+                y: 440,
+                dx: 4 * (Math.random() > 0.5 ? 1 : -1),
+                dy: -4,
+                radius: 8,
+                color: '#fff',
+                inPlay: false // Tıklayana kadar fırlatılmasın
+            }];
+            bullets = [];
+            powerUps = [];
+            particles = [];
+            lasers = [];
+            createBricks();
+        }
+
+        function createBricks() {
+            bricks = [];
+            for (let r = 0; r < brickRows; r++) {
+                for (let c = 0; c < brickCols; c++) {
+                    bricks.push({
+                        x: brickGap + c * (brickWidth + brickGap),
+                        y: 50 + r * (brickHeight + brickGap),
+                        width: brickWidth,
+                        height: brickHeight,
+                        color: brickColors[r],
+                        active: true
+                    });
+                }
+            }
+        }
+
+        // Fare ve Dokunmatik Kontrolleri
+        gameCanvas.addEventListener('mousemove', (e) => {
+            const rect = gameCanvas.getBoundingClientRect();
+            const root = document.documentElement;
+            const mouseX = e.clientX - rect.left - root.scrollLeft;
+            paddle.x = mouseX - paddle.width / 2;
+            
+            // Sınırlar
+            if (paddle.x < 0) paddle.x = 0;
+            if (paddle.x + paddle.width > gameCanvas.width) paddle.x = gameCanvas.width - paddle.width;
+        });
+
+        // Tıklama ile fırlatma ve ateş etme
+        gameCanvas.addEventListener('click', () => {
+            // Fırlatılmamış topları fırlat
+            balls.forEach(ball => {
+                if (!ball.inPlay) {
+                    ball.inPlay = true;
+                    ball.dy = -5;
+                    ball.dx = (Math.random() * 4) - 2;
+                }
+            });
+
+            // Lazer aktifse mermi fırlat
+            if (paddle.laserTimer > 0) {
+                lasers.push({ x: paddle.x + 10, y: paddle.y, dy: -8 });
+                lasers.push({ x: paddle.x + paddle.width - 10, y: paddle.y, dy: -8 });
+            }
+        });
+
+        // Dokunmatik Kontrol
+        gameCanvas.addEventListener('touchmove', (e) => {
+            const rect = gameCanvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const mouseX = touch.clientX - rect.left;
+            paddle.x = mouseX - paddle.width / 2;
+
+            if (paddle.x < 0) paddle.x = 0;
+            if (paddle.x + paddle.width > gameCanvas.width) paddle.x = gameCanvas.width - paddle.width;
+            e.preventDefault();
+        }, { passive: false });
+
+        // Parçacık Patlama Efekti
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 12; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    dx: (Math.random() - 0.5) * 6,
+                    dy: (Math.random() - 0.5) * 6,
+                    radius: Math.random() * 3 + 1,
+                    color: color,
+                    alpha: 1,
+                    decay: Math.random() * 0.02 + 0.01
+                });
+            }
+        }
+
+        // Ana Güncelleme Döngüsü
+        function update() {
+            // Lazer ve Genişlik Süreç Takibi
+            if (paddle.laserTimer > 0) paddle.laserTimer--;
+            if (paddle.widthTimer > 0) {
+                paddle.widthTimer--;
+                if (paddle.widthTimer === 0) paddle.width = 110; // Boyutu normale döndür
+            }
+
+            // Topların Hareketi
+            balls.forEach((ball, bIdx) => {
+                if (!ball.inPlay) {
+                    ball.x = paddle.x + paddle.width / 2;
+                    ball.y = paddle.y - ball.radius - 2;
+                    return;
+                }
+
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+
+                // Duvarlara Çarpma (Sol ve Sağ)
+                if (ball.x - ball.radius < 0) {
+                    ball.x = ball.radius;
+                    ball.dx = -ball.dx;
+                }
+                if (ball.x + ball.radius > gameCanvas.width) {
+                    ball.x = gameCanvas.width - ball.radius;
+                    ball.dx = -ball.dx;
+                }
+
+                // Tavan Çarpması
+                if (ball.y - ball.radius < 0) {
+                    ball.y = ball.radius;
+                    ball.dy = -ball.dy;
+                }
+
+                // Alt Tarafa Düşme (Ölüm)
+                if (ball.y + ball.radius > gameCanvas.height) {
+                    balls.splice(bIdx, 1);
+                    if (balls.length === 0) {
+                        lives--;
+                        paddle.laserTimer = 0;
+                        paddle.widthTimer = 0;
+                        paddle.width = 110;
+                        if (lives <= 0) {
+                            alert("OYUN BİTTİ! Skorun: " + score);
+                            initGame();
+                        } else {
+                            balls.push({
+                                x: paddle.x + paddle.width / 2,
+                                y: paddle.y - 10,
+                                dx: 0,
+                                dy: 0,
+                                radius: 8,
+                                color: '#fff',
+                                inPlay: false
+                            });
+                        }
+                    }
+                    return;
+                }
+
+                // Palete Çarpma
+                if (ball.y + ball.radius >= paddle.y && ball.y - ball.radius <= paddle.y + paddle.height &&
+                    ball.x >= paddle.x && ball.x <= paddle.x + paddle.width) {
+                    
+                    ball.dy = -Math.abs(ball.dy); // Yukarı zıplat
+                    // Çarpılan noktaya göre eğim ver
+                    let hitPoint = (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
+                    ball.dx = hitPoint * 6;
+                }
+
+                // Tuğlalara Çarpma Kontrolü
+                bricks.forEach(brick => {
+                    if (brick.active) {
+                        if (ball.x + ball.radius >= brick.x && ball.x - ball.radius <= brick.x + brick.width &&
+                            ball.y + ball.radius >= brick.y && ball.y - ball.radius <= brick.y + brick.height) {
+                            
+                            brick.active = false;
+                            score += 10;
+                            createExplosion(brick.x + brick.width / 2, brick.y + brick.height / 2, brick.color);
+                            ball.dy = -ball.dy;
+
+                            // Rastgele Güçlendirici Düşürme (%15 şans)
+                            if (Math.random() < 0.20) {
+                                const types = ['WIDE', 'LASER', 'MULTIBALL'];
+                                const randomType = types[Math.floor(Math.random() * types.length)];
+                                powerUps.push({
+                                    x: brick.x + brick.width / 2,
+                                    y: brick.y + brick.height,
+                                    type: randomType,
+                                    radius: 12,
+                                    speed: 2.5
+                                });
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Lazer Mermilerini Güncelle
+            lasers.forEach((laser, lIdx) => {
+                laser.y += laser.dy;
+                // Sınırdan çıktıysa sil
+                if (laser.y < 0) lasers.splice(lIdx, 1);
+
+                // Tuğlaya vurdu mu?
+                bricks.forEach(brick => {
+                    if (brick.active && laser.x >= brick.x && laser.x <= brick.x + brick.width &&
+                        laser.y >= brick.y && laser.y <= brick.y + brick.height) {
+                        
+                        brick.active = false;
+                        score += 10;
+                        createExplosion(brick.x + brick.width / 2, brick.y + brick.height / 2, brick.color);
+                        lasers.splice(lIdx, 1);
+                    }
+                });
+            });
+
+            // Güçlendiricileri Güncelle
+            powerUps.forEach((p, pIdx) => {
+                p.y += p.speed;
+
+                // Palet yakaladı mı?
+                if (p.y + p.radius >= paddle.y && p.y - p.radius <= paddle.y + paddle.height &&
+                    p.x >= paddle.x && p.x <= paddle.x + paddle.width) {
+                    
+                    // Güçlendiriciyi Aktif Et
+                    if (p.type === 'WIDE') {
+                        paddle.width = 180;
+                        paddle.widthTimer = 400; // Yaklaşık 7 saniye
+                    } else if (p.type === 'LASER') {
+                        paddle.laserTimer = 400;
+                    } else if (p.type === 'MULTIBALL') {
+                        // Sahaya 2 yeni top ekle
+                        balls.push({
+                            x: paddle.x + paddle.width / 2, y: paddle.y - 12,
+                            dx: (Math.random() * 6) - 3, dy: -5,
+                            radius: 8, color: '#fff', inPlay: true
+                        });
+                        balls.push({
+                            x: paddle.x + paddle.width / 2, y: paddle.y - 12,
+                            dx: (Math.random() * 6) - 3, dy: -5,
+                            radius: 8, color: '#fff', inPlay: true
+                        });
+                    }
+                    powerUps.splice(pIdx, 1);
+                }
+
+                // Ekrandan çıktıysa sil
+                if (p.y > gameCanvas.height) powerUps.splice(pIdx, 1);
+            });
+
+            // Parçacıkları Güncelle
+            particles.forEach((part, index) => {
+                part.x += part.dx;
+                part.y += part.dy;
+                part.alpha -= part.decay;
+                if (part.alpha <= 0) particles.splice(index, 1);
+            });
+
+            // Seviye Atlama Kontrolü (Tüm tuğlalar kırıldıysa)
+            if (bricks.every(b => !b.active)) {
+                level++;
+                createBricks();
+                balls.forEach(ball => {
+                    ball.inPlay = false;
+                    ball.x = paddle.x + paddle.width / 2;
+                    ball.y = paddle.y - 10;
+                });
+            }
+        }
+
+        // Çizim Fonksiyonu
+        function draw() {
+            // Arka Plan Temizliği
+            gCtx.fillStyle = '#020617';
+            gCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            // Tuğlaları Çiz
+            bricks.forEach(brick => {
+                if (brick.active) {
+                    gCtx.shadowBlur = 10;
+                    gCtx.shadowColor = brick.color;
+                    gCtx.fillStyle = brick.color;
+                    gCtx.fillRect(brick.x, brick.y, brick.width, brick.height);
+                    
+                    // İç detay parıltı çizgisi
+                    gCtx.shadowBlur = 0;
+                    gCtx.fillStyle = 'rgba(255,255,255,0.3)';
+                    gCtx.fillRect(brick.x, brick.y, brick.width, 3);
+                }
+            });
+
+            // Paleti Çiz (Lazer veya Geniş moduna göre renk)
+            gCtx.shadowBlur = 15;
+            let currentPaddleColor = paddle.color;
+            if (paddle.laserTimer > 0) currentPaddleColor = '#f43f5e'; // Kırmızı lazer modu
+            else if (paddle.widthTimer > 0) currentPaddleColor = '#10b981'; // Yeşil geniş mod
+
+            gCtx.shadowColor = currentPaddleColor;
+            gCtx.fillStyle = currentPaddleColor;
+            gCtx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+            gCtx.shadowBlur = 0;
+
+            // Lazer Mermilerini Çiz
+            lasers.forEach(laser => {
+                gCtx.fillStyle = '#ef4444';
+                gCtx.shadowColor = '#ef4444';
+                gCtx.shadowBlur = 10;
+                gCtx.fillRect(laser.x - 2, laser.y, 4, 15);
+                gCtx.shadowBlur = 0;
+            });
+
+            // Topları Çiz
+            balls.forEach(ball => {
+                gCtx.beginPath();
+                gCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                gCtx.fillStyle = ball.color;
+                gCtx.shadowColor = ball.color;
+                gCtx.shadowBlur = 12;
+                gCtx.fill();
+                gCtx.shadowBlur = 0;
+            });
+
+            // Güçlendiricileri Çiz
+            powerUps.forEach(p => {
+                gCtx.beginPath();
+                gCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                
+                let pColor = '#fff';
+                let pLabel = 'P';
+                if (p.type === 'WIDE') { pColor = '#10b981'; pLabel = '↔'; }
+                else if (p.type === 'LASER') { pColor = '#f43f5e'; pLabel = '▲'; }
+                else if (p.type === 'MULTIBALL') { pColor = '#a855f7'; pLabel = '●'; }
+
+                gCtx.fillStyle = pColor;
+                gCtx.shadowColor = pColor;
+                gCtx.shadowBlur = 15;
+                gCtx.fill();
+
+                // Güçlendirici İkonu/Yazısı
+                gCtx.shadowBlur = 0;
+                gCtx.fillStyle = '#000';
+                gCtx.font = 'bold 12px Courier New';
+                gCtx.textAlign = 'center';
+                gCtx.textBaseline = 'middle';
+                gCtx.fillText(pLabel, p.x, p.y);
+            });
+
+            // Parçacıkları Çiz
+            particles.forEach(p => {
+                gCtx.save();
+                gCtx.globalAlpha = p.alpha;
+                gCtx.beginPath();
+                gCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                gCtx.fillStyle = p.color;
+                gCtx.fill();
+                gCtx.restore();
+            });
+
+            // Skor, Seviye ve Can Bilgileri
+            gCtx.fillStyle = '#fff';
+            gCtx.font = 'bold 16px Share Tech Mono, Courier New';
+            gCtx.textAlign = 'left';
+            gCtx.fillText(`SKOR: ${score}`, 20, 30);
+            gCtx.fillText(`SEVİYE: ${level}`, 380, 30);
+            gCtx.fillText(`CAN: ${'❤️ '.repeat(lives)}`, 680, 30);
+
+            // Özel Aktif Mod Durum Yazısı
+            if (paddle.laserTimer > 0) {
+                gCtx.fillStyle = '#f43f5e';
+                gCtx.font = '12px Share Tech Mono';
+                gCtx.fillText(`LAZER MODU AKTİF [${Math.ceil(paddle.laserTimer/60)}s]`, 20, 490);
+            } else if (paddle.widthTimer > 0) {
+                gCtx.fillStyle = '#10b981';
+                gCtx.font = '12px Share Tech Mono';
+                gCtx.fillText(`PALET GENİŞLETİLDİ [${Math.ceil(paddle.widthTimer/60)}s]`, 20, 490);
+            }
+        }
+
+        // Oyun Döngüsü
+        function gameLoop() {
+            if (gameActive) {
+                update();
+                draw();
+                gameLoopId = requestAnimationFrame(gameLoop);
             }
         }
     </script>
