@@ -3,1562 +3,1314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhammed Gazi | Portfolio, Games & AI Audio Lab</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Muhammed Gazi | Cyber Portfolio</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <!-- FontAwesome İkonları -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- MediaPipe Yapay Zeka Kütüphaneleri -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Three.js (For 3D Game) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
-        /* Tasarım Ayarları ve Özelleştirmeler */
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #030712;
-            color: #f3f4f6;
-            scroll-behavior: smooth;
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #03000a;
+            color: #e2e8f0;
+            overflow-x: hidden;
         }
-        
-        .futuristic-glow {
-            text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
         }
-
-        .hud-font {
+        .font-mono-tech {
             font-family: 'Share Tech Mono', monospace;
         }
-
-        /* --- AIR DRAW (HUD) CSS AYARLARI --- */
-        #airdraw-container {
-            display: none; /* Başlangıçta gizli */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9999;
-            background-color: #010a10;
-            overflow: hidden;
-            font-family: 'Share Tech Mono', monospace;
-            user-select: none;
+        /* Neon Glow Effects */
+        .neon-border-pink {
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4), inset 0 0 15px rgba(255, 0, 127, 0.2);
+            border: 1px solid rgba(255, 0, 127, 0.6);
         }
-
-        /* Video arka planda kalacak, transparan */
+        .neon-border-cyan {
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4), inset 0 0 15px rgba(0, 242, 254, 0.2);
+            border: 1px solid rgba(0, 242, 254, 0.6);
+        }
+        .neon-text-pink {
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.8), 0 0 20px rgba(255, 0, 127, 0.4);
+        }
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.8), 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+        .cyber-grid {
+            background-image: 
+                linear-gradient(rgba(18, 10, 36, 0.8) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(18, 10, 36, 0.8) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #03000a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff007f;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f2fe;
+        }
+        /* Video Container stylings */
         #webcam {
             transform: scaleX(-1);
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            opacity: 0.15;
-            z-index: 1;
-            filter: grayscale(50%) contrast(120%);
-        }
-        
-        /* Çizim Tuvali */
-        #drawing_canvas {
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            z-index: 10;
-        }
-        /* Arayüz ve İskelet Tuvali */
-        #hud_canvas {
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            z-index: 20;
-            pointer-events: none;
-        }
-
-        /* Yükleme Ekranı */
-        #loader {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #010a10;
-            color: #00f0ff;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-shadow: 0 0 10px #00f0ff;
-        }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid transparent;
-            border-top: 3px solid #00f0ff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Fütüristik HUD Katmanları */
-        .hud-overlay {
-            position: absolute;
-            pointer-events: none;
-            z-index: 30;
-        }
-        #top-left {
-            top: 30px;
-            left: 30px;
-            border-left: 3px solid #00f0ff;
-            padding-left: 15px;
-            text-shadow: 0 0 8px #00f0ff;
-        }
-        #sys-title {
-            color: #00f0ff;
-            font-size: 24px;
-            letter-spacing: 4px;
-            margin: 0;
-        }
-        #sys-logs {
-            color: #00ff66;
-            font-size: 14px;
-            margin-top: 10px;
-            line-height: 1.5;
-        }
-        
-        .hud-grid {
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            background: 
-                linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* Sanal Buton CSS Görünümleri (Sadece efekt için) */
-        .hologram-btn {
-            position: absolute;
-            border: 1px solid #00f0ff;
-            color: #00f0ff;
-            font-family: inherit;
-            font-size: 16px;
-            font-weight: bold;
-            padding: 10px 20px;
-            background: rgba(0, 240, 255, 0.1);
-            box-shadow: 0 0 10px rgba(0,240,255,0.2);
-            transition: all 0.2s;
-            z-index: 40;
-            pointer-events: none;
-        }
-        #btn-clear { top: 30px; right: 30px; }
-        #btn-color { top: 90px; right: 30px; }
-        #btn-full { top: 150px; right: 30px; }
-
-        /* Geri Dön Butonu */
-        #btn-exit-container {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            z-index: 999;
-        }
-
-        /* --- ARCADE GAME CSS AYARLARI --- */
-        #game-view {
-            display: none; /* Başlangıçta gizli */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9998;
-            background-color: #020617;
-            overflow: hidden;
-            user-select: none;
-            cursor: none; /* Oyunda imleç gizlensin */
-        }
-        /* Çıkış butonunun üstüne gelince imleç geri gelsin */
-        #game-view button {
-            cursor: auto;
-        }
-
-        /* --- AI AUDIO LAB CSS AYARLARI --- */
-        #audio-view {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 9997;
-            background-color: #050510;
-            overflow: hidden;
         }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col justify-between">
+<body class="cyber-grid min-h-screen flex flex-col justify-between">
 
-    <!-- ==================== PORTFOLYO GÖRÜNÜMÜ ==================== -->
-    <div id="portfolio-view" class="w-full">
-        <!-- Header -->
-        <header class="border-b border-gray-800 bg-gray-950/80 backdrop-blur-md sticky top-0 z-50">
-            <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-                <span class="text-2xl font-extrabold tracking-wider text-cyan-400 futuristic-glow">MG_STUDIO</span>
-                <nav class="hidden md:flex space-x-8 text-sm font-medium tracking-wide">
-                    <a href="#about" class="hover:text-cyan-400 transition">Hakkımda</a>
-                    <a href="#projects" class="hover:text-cyan-400 transition">Projelerim</a>
-                    <a href="#contact" class="hover:text-cyan-400 transition">İletişim</a>
-                </nav>
-            </div>
-        </header>
+    <!-- Ambient Background Lighting -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-pink-600 rounded-full blur-[180px] opacity-20 pointer-events-none"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-cyan-500 rounded-full blur-[180px] opacity-20 pointer-events-none"></div>
 
-        <!-- Hero Section -->
-        <section class="max-w-6xl mx-auto px-6 py-20 md:py-32 flex flex-col items-center text-center">
-            <div class="w-24 h-24 bg-cyan-950 border border-cyan-500 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/20">
-                <i class="fa-solid fa-gamepad text-4xl text-cyan-400"></i>
+    <!-- Header / Navbar -->
+    <header class="border-b border-purple-950/50 bg-black/40 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-pink-500 to-cyan-500 flex items-center justify-center font-orbitron font-black text-xl text-black shadow-[0_0_15px_rgba(255,0,127,0.5)]">M</div>
+                <span class="font-orbitron font-bold tracking-widest text-lg bg-gradient-to-r from-pink-500 to-cyan-400 bg-clip-text text-transparent">MUHAMMED GAZİ</span>
             </div>
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                Muhammed Gazi
+            <nav class="hidden md:flex space-x-8 font-mono-tech text-sm uppercase tracking-wider">
+                <a href="#about" class="hover:text-pink-500 transition-colors duration-300">Hakkımda</a>
+                <a href="#projects" class="hover:text-cyan-400 transition-colors duration-300">Siber Projeler</a>
+                <a href="#skills" class="hover:text-pink-500 transition-colors duration-300">Donanım</a>
+                <a href="#contact" class="hover:text-cyan-400 transition-colors duration-300">Terminal</a>
+            </nav>
+            <div>
+                <a href="#contact" class="px-4 py-2 rounded border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 font-mono-tech text-xs tracking-widest transition-all duration-300 shadow-[0_0_10px_rgba(0,242,254,0.1)]">BAĞLANTI KUR</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero / Intro Section -->
+    <section class="max-w-6xl mx-auto px-6 py-20 w-full grid grid-cols-1 md:grid-cols-12 gap-12 items-center" id="about">
+        <div class="md:col-span-7 space-y-6">
+            <div class="inline-flex items-center space-x-2 bg-pink-500/10 border border-pink-500/20 px-3 py-1 rounded-full text-pink-400 text-xs font-mono-tech tracking-widest uppercase">
+                <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span>
+                <span>Sistem Çevrimiçi</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-orbitron font-black tracking-tight leading-none text-white">
+                GELECEĞİN <br>
+                <span class="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">KOD MİMARI</span>
             </h1>
-            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mb-8">
-                Geleceğin teknolojilerini keşfeden, yapay zeka projeleri üreten ve oyun dünyasında kod yazan genç geliştirici. Dijital evrenime hoş geldin!
+            <p class="text-gray-400 text-lg font-light leading-relaxed max-w-lg">
+                Yapay zeka sistemleri, gerçek zamanlı bilgisayarlı görü projeleri ve siber dünya için yenilikçi web arayüzleri geliştiriyorum. Teknolojiyi sınırlarında yaşamayı severim.
             </p>
-            <div class="flex gap-4">
-                <a href="#projects" class="bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold px-6 py-3 rounded-xl shadow-lg shadow-cyan-500/30 transition flex items-center gap-2">
-                    <i class="fa-solid fa-rocket"></i> Projelerimi Gör
-                </a>
-                <a href="#contact" class="border border-gray-700 hover:border-cyan-400 px-6 py-3 rounded-xl transition text-gray-300">
-                    Bana Ulaş
-                </a>
+            <div class="flex space-x-4 pt-4">
+                <a href="#projects" class="px-6 py-3 rounded bg-gradient-to-r from-pink-600 to-pink-500 text-white font-orbitron font-bold text-sm tracking-wider shadow-[0_0_20px_rgba(255,0,127,0.4)] hover:shadow-[0_0_30px_rgba(255,0,127,0.6)] transition-all duration-300">PROJELERİ İNCELE</a>
+                <a href="https://github.com/muhammedgamer13x-boop" target="_blank" class="px-6 py-3 rounded border border-gray-700 hover:border-cyan-400 hover:text-cyan-400 font-orbitron font-bold text-sm tracking-wider transition-all duration-300">GITHUB PROFİLİ</a>
             </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="max-w-4xl mx-auto px-6 py-16 border-t border-gray-900">
-            <h2 class="text-3xl font-bold mb-8 text-center text-cyan-400">Hakkımda</h2>
-            <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 text-gray-300 leading-relaxed space-y-4">
-                <p>
-                    Merhaba! Ben Muhammed Gazi. Teknolojiye, yazılıma ve oyun geliştirmeye büyük bir tutku duyuyorum. Bilgisayar karşısında sadece oyun oynamakla kalmayıp, o oyunların arkasındaki yapay zeka mekanizmalarını ve kod yapılarını merak ederek bu yolculuğa başladım.
-                </p>
-                <p>
-                    Şu an kendi web sitemi kuruyor, yeni yazılım dilleri öğreniyor ve en önemlisi yapay zeka entegrasyonlu (el hareketlerini tanıyan, yüz algılayan) projeler üzerinde çalışıyorum. Sınırları zorlamayı seviyorum!
-                </p>
+        </div>
+        
+        <!-- Interactive Avatar/Hologram Area -->
+        <div class="md:col-span-5 flex justify-center relative">
+            <div class="w-72 h-72 rounded-3xl bg-gradient-to-tr from-pink-600/20 to-cyan-500/20 relative flex items-center justify-center overflow-hidden border border-purple-500/30 neon-border-pink">
+                <!-- Inner Tech Lines -->
+                <div class="absolute inset-4 rounded-2xl border border-dashed border-cyan-500/20 animate-[spin_20s_linear_infinite]"></div>
+                <div class="absolute inset-8 rounded-2xl border border-double border-pink-500/20 animate-[spin_10s_linear_infinite_reverse]"></div>
+                <!-- Avatar Icon -->
+                <i class="fa-solid fa-user-astronaut text-8xl text-cyan-400 animate-bounce"></i>
+                <!-- Tech Stats overlay -->
+                <div class="absolute bottom-4 left-4 right-4 bg-black/80 border border-cyan-500/20 rounded p-2 text-center">
+                    <p class="font-mono-tech text-[10px] text-cyan-400 tracking-widest">VERİ AKIŞI AKTİF: 100%</p>
+                </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Projects Section -->
-        <section id="projects" class="max-w-6xl mx-auto px-6 py-16 border-t border-gray-900">
-            <h2 class="text-3xl font-bold mb-12 text-center text-cyan-400">Projelerim</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                <!-- Air Draw Projesi (ÖZEL YAPAY ZEKA PROJEMİZ) -->
-                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg hover:border-cyan-500/50 flex flex-col justify-between group transition-all duration-300">
-                    <div>
-                        <div class="w-12 h-12 bg-cyan-950 border border-cyan-400 rounded-xl flex items-center justify-center mb-4 text-cyan-400 text-xl shadow-md">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 text-cyan-300">Air Draw (ARK HUD)</h3>
-                        <p class="text-gray-400 text-sm mb-6">
-                            Gelişmiş yapay zeka (MediaPipe) kullanarak kameranız karşısında sadece el hareketlerinizle havada çizim yapmanızı sağlayan Tony Stark tarzı HUD arayüzlü çizim projesi.
-                        </p>
-                    </div>
-                    <!-- Çalıştırma Butonu -->
-                    <button onclick="startAirDraw()" class="w-full bg-cyan-500 hover:bg-cyan-600 text-gray-950 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-play"></i> Sistemi Başlat
-                    </button>
-                </div>
+    <!-- Projects Grid Section -->
+    <section class="max-w-6xl mx-auto px-6 py-24 w-full border-t border-purple-950/30" id="projects">
+        <div class="text-center space-y-4 mb-16">
+            <h2 class="text-3xl md:text-5xl font-orbitron font-bold tracking-wider text-white">AKTİF SİBER PROJELERİM</h2>
+            <div class="w-24 h-1 bg-gradient-to-r from-pink-500 to-cyan-400 mx-auto rounded-full"></div>
+            <p class="text-gray-500 font-mono-tech tracking-wide text-xs">YAPAY ZEKA VE ETKİLEŞİMLİ DENEYSEL ÇALIŞMALAR</p>
+        </div>
 
-                <!-- Proje 2 (HTML5 TUĞLA KIRMA OYUNU) -->
-                <div class="bg-gray-900 border-2 border-fuchsia-500/40 rounded-2xl p-6 shadow-lg hover:border-fuchsia-400 flex flex-col justify-between group transition-all duration-300 shadow-fuchsia-500/5">
-                    <div>
-                        <div class="w-12 h-12 bg-fuchsia-950 border border-fuchsia-400 rounded-xl flex items-center justify-center mb-4 text-fuchsia-400 text-xl shadow-md">
-                            <i class="fa-solid fa-ghost"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 text-fuchsia-300">Cyber Breakout</h3>
-                        <p class="text-gray-400 text-sm mb-6">
-                            Tamamen tarayıcı üzerinden oynanabilen, neon tasarımlı, parçacık efektli ve lazer, geniş palet, çoklu top gibi özel güçlendiricilere sahip retro atari tuğla kırma oyunu!
-                        </p>
-                    </div>
-                    <!-- Çalıştırma Butonu -->
-                    <button onclick="startArcadeGame()" class="w-full bg-fuchsia-500 hover:bg-fuchsia-600 text-gray-950 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-gamepad"></i> Oyunu Başlat
-                    </button>
-                </div>
-
-                <!-- Proje 3 (AI GESTURE AUDIO LAB - YENİ HARİKA PROJEMİZ) -->
-                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg hover:border-emerald-500/50 flex flex-col justify-between group transition-all duration-300">
-                    <div>
-                        <div class="w-12 h-12 bg-emerald-950 border border-emerald-400 rounded-xl flex items-center justify-center mb-4 text-emerald-400 text-xl shadow-md">
-                            <i class="fa-solid fa-music"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2 text-emerald-300">AI Audio Lab & Synth</h3>
-                        <p class="text-gray-400 text-sm mb-6">
-                            Gelişmiş Web Audio sentezleyicisi ve el takip kamerasıyla, havada parmaklarını yaklaştırıp uzaklaştırarak müziğin sesini ve ses dalgası frekansını kontrol edebileceğin harika müzik laboratuvarı!
-                        </p>
-                    </div>
-                    <!-- Çalıştırma Butonu -->
-                    <button onclick="startAudioLab()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-sliders"></i> Laboratuvarı Aç
-                    </button>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="max-w-4xl mx-auto px-6 py-16 border-t border-gray-900">
-            <h2 class="text-3xl font-bold mb-8 text-center text-cyan-400">İletişim</h2>
-            <div class="grid md:grid-cols-2 gap-8 bg-gray-900/30 border border-gray-800 rounded-2xl p-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4">Benimle İrtibata Geçin</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
-                        Projelerim hakkında konuşmak, yeni fikirler paylaşmak veya ortak iş birlikleri için bana aşağıdaki kanallardan her zaman yazabilirsin.
-                    </p>
-                    <div class="space-y-3 text-sm">
-                        <div class="flex items-center gap-3 text-gray-300">
-                            <i class="fa-solid fa-envelope text-cyan-400"></i>
-                            muhammedgamer13x@gmail.com
-                        </div>
-                        <div class="flex items-center gap-3 text-gray-300">
-                            <i class="fa-brands fa-github text-cyan-400"></i>
-                            github.com/muhammedgamer13x-boop
-                        </div>
-                    </div>
-                </div>
-                <!-- Mini Form Görünümü -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- PROJECT 1: AIR DRAW -->
+            <div class="bg-black/40 border border-purple-950/50 rounded-2xl p-6 hover:border-pink-500/50 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1">
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs uppercase font-bold tracking-wider text-gray-400 mb-2">Mesajınız</label>
-                        <textarea readonly class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-sm text-gray-300 h-24 focus:outline-none" placeholder="Lütfen e-posta adresimden doğrudan bana ulaşın. En kısa sürede döneceğim!"></textarea>
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-lg bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-500 text-xl"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <span class="text-pink-500 font-mono-tech text-xs tracking-widest">LIVE / JS AI</span>
                     </div>
-                    <a href="mailto:muhammedgamer13x@gmail.com" class="w-full block text-center bg-cyan-950 text-cyan-400 border border-cyan-500/50 font-bold py-3 rounded-xl hover:bg-cyan-500 hover:text-gray-950 transition text-sm">
-                        E-posta Gönder
-                    </a>
+                    <h3 class="text-2xl font-orbitron font-bold group-hover:text-pink-400 transition-colors">Air Draw AI</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Kameranızı açarak yapay zeka el algılama teknolojisiyle havada çizim yapın! Parmaklarınızı birleştirerek çizin, açarak duraklatın.</p>
+                </div>
+                <div class="pt-6">
+                    <button onclick="openAirDraw()" class="w-full py-2.5 rounded bg-pink-500/10 hover:bg-pink-500 text-pink-400 hover:text-white font-orbitron text-xs font-bold tracking-widest transition-all duration-300 border border-pink-500/30">UYGULAMAYI BAŞLAT</button>
                 </div>
             </div>
-        </section>
 
-        <!-- Footer -->
-        <footer class="border-t border-gray-900 py-8 bg-gray-950">
-            <div class="max-w-6xl mx-auto px-6 text-center text-xs text-gray-500">
-                &copy; 2026 Muhammed Gazi. Tüm Hakları Saklıdır. Bu site tamamen ücretsiz olarak GitHub Pages ile yayınlanmıştır.
-            </div>
-        </footer>
-    </div>
-
-
-    <!-- ==================== AIR DRAW GÖRÜNÜMÜ ==================== -->
-    <div id="airdraw-container">
-        <!-- Grid Arka Planı -->
-        <div class="hud-grid"></div>
-
-        <!-- Kamera, Çizim ve İskelet katmanları -->
-        <video id="webcam" autoplay playsinline></video>
-        <canvas id="drawing_canvas"></canvas>
-        <canvas id="hud_canvas"></canvas>
-
-        <!-- Sol Üst HUD Paneli -->
-        <div class="hud-overlay" id="top-left">
-            <h1 id="sys-title">STARK_OS v3.0</h1>
-            <div id="sys-logs">
-                [SİSTEM]: Beklemede...<br>
-                [DURUM]: Algılayıcılar Çevrimdışı
-            </div>
-        </div>
-
-        <!-- Sağ Taraf Sanal Buton Görünümleri -->
-        <div class="hologram-btn" id="btn-clear">[ TEMİZLE ]</div>
-        <div class="hologram-btn" id="btn-color">[ RENK DEĞİŞTİR ]</div>
-        <div class="hologram-btn" id="btn-full">[ TAM EKRAN ]</div>
-
-        <!-- Sol Alt: Portfolyoya Güvenli Çıkış Butonu -->
-        <div id="btn-exit-container">
-            <button onclick="stopAirDraw()" class="pointer-events-auto border border-red-500/80 color-red-500 text-red-500 px-5 py-2 bg-red-950/20 rounded font-semibold transition hover:bg-red-500 hover:text-white flex items-center gap-2">
-                <i class="fa-solid fa-arrow-left"></i> ← PORTFOLYOYA DÖN
-            </button>
-        </div>
-
-        <!-- Yükleme Modülü -->
-        <div id="loader">
-            <div class="spinner"></div>
-            <h2 id="loader-text">JARVIS SİSTEMLERİ BAŞLATILIYOR...</h2>
-            <p class="text-xs mt-2 opacity-80">Kamera İzni Bekleniyor ve AI Modülleri İndiriliyor (10-15 saniye sürebilir)</p>
-        </div>
-    </div>
-
-
-    <!-- ==================== ARCADE OYUN GÖRÜNÜMÜ ==================== -->
-    <div id="game-view" class="flex flex-col items-center justify-center">
-        <!-- Retro Arcade HUD Grid Arka Plan -->
-        <div class="absolute inset-0 bg-[linear-gradient(rgba(244,63,94,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(244,63,94,0.04)_1px,transparent_1px)] bg-[size:30px_30px] pointer-events-none"></div>
-        
-        <div class="relative z-10 flex flex-col items-center w-full max-w-4xl p-4">
-            <!-- Arcade Header -->
-            <div class="w-full flex justify-between items-center mb-4 border-b-2 border-fuchsia-500/40 pb-3">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-gamepad text-3xl text-fuchsia-500 animate-pulse"></i>
-                    <h1 class="text-2xl font-black hud-font tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-pink-500">CYBER_BREAKOUT v1.0</h1>
-                </div>
-                <!-- Çıkış Butonu -->
-                <button onclick="stopArcadeGame()" class="border border-rose-500 text-rose-500 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-rose-500 hover:text-white transition flex items-center gap-2 z-[99999]">
-                    <i class="fa-solid fa-circle-xmark"></i> OYUNDAN ÇIK
-                </button>
-            </div>
-
-            <!-- Oyun Tuvali (Canvas) -->
-            <div class="relative border-4 border-fuchsia-500/60 rounded-2xl overflow-hidden shadow-2xl shadow-fuchsia-500/20 bg-slate-950">
-                <canvas id="game-canvas" width="800" height="500" class="block max-w-full"></canvas>
-            </div>
-
-            <!-- Oyun Alt Bilgisi / Kontroller -->
-            <div class="w-full flex flex-col md:flex-row justify-between items-center mt-4 text-xs font-semibold text-gray-400 bg-slate-900/50 p-4 border border-gray-800 rounded-xl gap-3">
-                <div class="flex items-center gap-4">
-                    <span class="flex items-center gap-1.5"><kbd class="bg-gray-800 px-2 py-0.5 rounded text-white border border-gray-700">FARE HAREKETİ</kbd> Paleti Yönlendir</span>
-                    <span class="flex items-center gap-1.5"><kbd class="bg-gray-800 px-2 py-0.5 rounded text-white border border-gray-700">SOL TIK</kbd> Topu Fırlat / Lazer Ateşle</span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-emerald-400 font-bold">🟢 Geniş Palet</span>
-                    <span class="text-rose-400 font-bold">🔴 Lazer Palet</span>
-                    <span class="text-purple-400 font-bold">🟣 Ekstra Top</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ==================== AI GESTURE AUDIO LAB GÖRÜNÜMÜ ==================== -->
-    <div id="audio-view" class="flex flex-col items-center justify-center">
-        <!-- Neon Grid Arka Planı -->
-        <div class="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
-
-        <!-- Kamera Katmanı (Küçük fütüristik ekran) -->
-        <video id="audio-webcam" class="absolute top-6 right-6 w-48 h-36 border border-emerald-500/40 rounded-xl bg-black object-cover transform scaleX(-1) opacity-0 transition-opacity duration-500 z-50 shadow-lg shadow-emerald-500/10" autoplay playsinline></video>
-
-        <div class="relative z-10 w-full max-w-5xl px-6 py-4 flex flex-col h-[90vh] justify-between">
-            <!-- Header -->
-            <div class="flex justify-between items-center border-b border-emerald-500/30 pb-4">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-wave-square text-3xl text-emerald-400 animate-pulse"></i>
-                    <div>
-                        <h1 class="text-xl font-bold hud-font tracking-wider text-emerald-300">AI_AUDIO_LAB v2.0</h1>
-                        <p class="text-xs text-gray-400">Yapay Zeka Destekli Frekans Sentezleyici</p>
+            <!-- PROJECT 2: CYBER BREAKOUT GAME -->
+            <div class="bg-black/40 border border-purple-950/50 rounded-2xl p-6 hover:border-cyan-500/50 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl"><i class="fa-solid fa-gamepad"></i></div>
+                        <span class="text-cyan-400 font-mono-tech text-xs tracking-widest">HTML5 GAME</span>
                     </div>
+                    <h3 class="text-2xl font-orbitron font-bold group-hover:text-cyan-400 transition-colors">Cyber Breakout</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Retro fütüristik neon tuğla kırma oyunu! Rastgele düşen lazer, ekstra top ve geniş palet güçlendiricilerini toplayarak puanları katla.</p>
                 </div>
-                <button onclick="stopAudioLab()" class="border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500 hover:text-gray-950 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">
-                    ← PORTFOLYOYA DÖN
-                </button>
+                <div class="pt-6">
+                    <button onclick="openBreakout()" class="w-full py-2.5 rounded bg-cyan-500/10 hover:bg-cyan-500 text-cyan-400 hover:text-white font-orbitron text-xs font-bold tracking-widest transition-all duration-300 border border-cyan-500/30">OYUNU BAŞLAT</button>
+                </div>
             </div>
 
-            <!-- Main Panel Split -->
-            <div class="grid lg:grid-cols-3 gap-8 my-auto items-center">
-                <!-- Sol Taraf Kontroller -->
-                <div class="bg-gray-950/80 border border-emerald-500/20 p-6 rounded-2xl flex flex-col gap-6">
-                    <h3 class="font-bold text-gray-100 border-b border-gray-800 pb-2">🎛️ Manuel Kontroller</h3>
-                    
-                    <!-- Başlat / Durdur -->
-                    <button id="btn-synth-toggle" onclick="toggleSynthPlay()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-bold py-4 rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 text-lg">
-                        <i id="synth-play-icon" class="fa-solid fa-play"></i> <span id="synth-play-text">Sentezleyiciyi Çalıştır</span>
-                    </button>
-
-                    <!-- AI Modu Butonu -->
-                    <button id="btn-ai-toggle" onclick="toggleAISynth()" class="w-full border-2 border-emerald-500/30 text-emerald-400 hover:border-emerald-400 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-camera"></i> <span id="ai-toggle-text">Yapay Zeka (AI) El Kontrolü: PASİF</span>
-                    </button>
-
-                    <!-- Sürgüler -->
-                    <div class="space-y-4 text-xs font-semibold text-gray-400">
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span>SES SEVİYESİ</span>
-                                <span id="val-synth-vol">30%</span>
-                            </div>
-                            <input id="slider-vol" oninput="updateSynthParams()" type="range" min="0" max="1" step="0.05" value="0.3" class="w-full accent-emerald-400 bg-gray-800 h-1.5 rounded-lg appearance-none cursor-pointer">
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span>FİLTRE FREKANSI (CUTOFF)</span>
-                                <span id="val-synth-freq">800 Hz</span>
-                            </div>
-                            <input id="slider-freq" oninput="updateSynthParams()" type="range" min="100" max="5000" step="50" value="800" class="w-full accent-emerald-400 bg-gray-800 h-1.5 rounded-lg appearance-none cursor-pointer">
-                        </div>
+            <!-- PROJECT 3: 3D SPACE VOYAGE (NEW) -->
+            <div class="bg-black/40 border border-purple-950/50 rounded-2xl p-6 hover:border-purple-500/50 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-xl"><i class="fa-solid fa-shuttle-space"></i></div>
+                        <span class="text-purple-400 font-mono-tech text-xs tracking-widest">3D THREE.JS</span>
                     </div>
+                    <h3 class="text-2xl font-orbitron font-bold group-hover:text-purple-400 transition-colors">3D Space Voyage</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Three.js kütüphanesiyle hazırlanan 3D etkileşimli uzay simülasyonu! Yön tuşlarıyla uçun, fareyle etrafı gözleyin ve uzayı keşfedin.</p>
                 </div>
-
-                <!-- Orta Taraf Dalga Görselleştiricisi -->
-                <div class="lg:col-span-2 bg-gray-950/80 border border-emerald-500/20 p-6 rounded-2xl flex flex-col justify-between h-[360px] relative overflow-hidden">
-                    <h3 class="font-bold text-emerald-400 mb-2 hud-font flex justify-between">
-                        <span>📊 SPEKTRUM ANALİZÖRÜ</span>
-                        <span id="ai-dist-readout" class="text-xs text-amber-400 hidden">Parmak Mesafesi: Ölçülüyor...</span>
-                    </h3>
-                    <canvas id="visualizer-canvas" class="w-full h-[220px] rounded-xl border border-emerald-500/10 bg-black/40"></canvas>
-                    <div class="text-center text-[11px] text-gray-500 font-mono mt-2">
-                        [DURUM]: <span id="audio-status-log" class="text-emerald-500">Müzik Bekliyor... Sentezleyiciyi çalıştırın.</span>
-                    </div>
+                <div class="pt-6">
+                    <button onclick="openSpaceVoyage()" class="w-full py-2.5 rounded bg-purple-500/10 hover:bg-purple-500 text-purple-400 hover:text-white font-orbitron text-xs font-bold tracking-widest transition-all duration-300 border border-purple-500/30">UZAY YOLCULUĞUNA ÇIK</button>
                 </div>
             </div>
 
-            <!-- Python Kod Butonu (Alt Kısım) -->
-            <div class="flex justify-between items-center bg-gray-900/30 border border-gray-800 p-4 rounded-xl text-xs text-gray-400">
-                <span class="flex items-center gap-2"><i class="fa-solid fa-lightbulb text-emerald-400 text-sm"></i> AI Modu'nu açtıktan sonra elinin başparmağını ve işaret parmağını kameraya gösterip mesafeyi değiştirerek müziği şekillendir!</span>
-                <button onclick="openPythonModal()" class="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-xl font-bold hover:bg-emerald-500 hover:text-gray-950 transition">
-                    <i class="fa-brands fa-python"></i> Python Kodunu Al
-                </button>
-            </div>
         </div>
-    </div>
+    </section>
 
-
-    <!-- ==================== PYTHON KOD MODAL SİSTEMİ ==================== -->
-    <div id="python-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[10000] hidden items-center justify-center p-4">
-        <div class="bg-gray-900 border border-cyan-500/50 rounded-2xl w-full max-w-3xl h-[80vh] flex flex-col overflow-hidden shadow-2xl shadow-cyan-500/20">
-            <!-- Modal Header -->
-            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-950/50">
-                <div class="flex items-center gap-3">
-                    <i class="fa-brands fa-python text-2xl text-cyan-400"></i>
-                    <h2 class="text-xl font-bold text-gray-100">AI Gesture Volume Control (.py)</h2>
+    <!-- Technical Skills Section -->
+    <section class="max-w-6xl mx-auto px-6 py-24 w-full border-t border-purple-950/30" id="skills">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+            <div class="md:col-span-5 space-y-6">
+                <h2 class="text-3xl md:text-4xl font-orbitron font-bold tracking-wider text-white">DONANIM & YETENEKLER</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-pink-500 to-cyan-400 rounded-full"></div>
+                <p class="text-gray-400 text-sm leading-relaxed">
+                    Yapay zeka projelerini web dünyasıyla birleştirerek canlı, etkileşimli ve yüksek performanslı dijital deneyimler geliştiriyorum.
+                </p>
+                <div class="font-mono-tech text-xs space-y-2 text-cyan-400">
+                    <p><i class="fa-solid fa-angle-right mr-2"></i> KULLANICI ARAYÜZÜ: TAILWIND CSS & HTML5</p>
+                    <p><i class="fa-solid fa-angle-right mr-2"></i> YAPAY ZEKA: MEDIAPIPE AI & TENSORFLOW.JS</p>
+                    <p><i class="fa-solid fa-angle-right mr-2"></i> MÜHENDİSLİK: PYTHON, WEB AUDIO API, THREE.JS</p>
                 </div>
-                <button onclick="closePythonModal()" class="text-gray-400 hover:text-white transition text-2xl">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
             </div>
-            
-            <!-- Modal Body (Code View) -->
-            <div class="p-6 flex-1 overflow-y-auto space-y-4">
-                <div class="bg-cyan-950/20 border border-cyan-800/40 rounded-xl p-4 text-xs text-cyan-300">
-                    <p class="font-bold mb-1">💡 Bu Program Nasıl Çalıştırılır?</p>
-                    <p>1. Bilgisayarınızda Python yüklü olmalıdır.<br>
-                    2. Terminale şu komutu yazarak gerekli kütüphaneleri yükleyin:<br>
-                    <code class="bg-gray-950 px-2 py-0.5 rounded text-white font-mono select-all">pip install opencv-python mediapipe pycaw numpy</code><br>
-                    3. Kodları bir dosyaya <code class="text-white">ses_kontrol.py</code> adıyla kaydedip çalıştırın!</p>
+            <div class="md:col-span-7 grid grid-cols-2 gap-4">
+                <div class="bg-black/20 p-4 border border-purple-950/30 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center"><span class="font-bold text-white">Python & AI</span><span class="text-pink-500 font-mono-tech text-xs">85%</span></div>
+                    <div class="w-full h-1.5 bg-purple-950/40 rounded-full overflow-hidden"><div class="h-full bg-pink-500 rounded-full" style="width: 85%"></div></div>
                 </div>
-
-                <!-- Code Container -->
-                <div class="relative">
-                    <button onclick="copyCode()" class="absolute top-3 right-3 bg-gray-800 hover:bg-cyan-500 hover:text-gray-950 text-gray-300 text-xs font-bold px-3 py-1.5 rounded transition flex items-center gap-1.5">
-                        <i class="fa-regular fa-copy"></i> <span id="copy-text">Kopyala</span>
-                    </button>
-                    <pre class="bg-gray-950 p-5 rounded-xl border border-gray-800 text-sm overflow-x-auto text-emerald-400 font-mono" id="python-code"><code>import cv2
-import mediapipe as mp
-import math
-import numpy as np
-from ctypes import cast, POINTER
-from comtypes import CLSCTX_ALL
-from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-
-# 1. Kamerayı ve MediaPipe El Algılayıcıyı Başlat
-cap = cv2.VideoCapture(0)
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
-mp_draw = mp.solutions.drawing_utils
-
-# 2. Bilgisayarın Ses Kartı Ayarlarına Bağlan (Windows için)
-devices = AudioUtilities.GetSpeakers()
-interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-volume = cast(interface, POINTER(IAudioEndpointVolume))
-vol_range = volume.GetVolumeRange() # [Min Ses, Max Ses]
-min_vol = vol_range[0]
-max_vol = vol_range[1]
-
-print("[SİSTEM] Yapay Zeka Ses Kontrolü Başlatıldı. Çıkış için 'q' basın.")
-
-while True:
-    success, img = cap.read()
-    if not success:
-        break
-        
-    img = cv2.flip(img, 1) # Aynalama
-    h, w, c = img.shape
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    results = hands.process(img_rgb)
-    
-    vol_bar = 400 # Varsayılan grafik bar yüksekliği
-    vol_per = 0   # Varsayılan yüzde seviyesi
-    
-    if results.multi_hand_landmarks:
-        for hand_lms in results.multi_hand_landmarks:
-            # El iskeletini çiz
-            mp_draw.draw_landmarks(img, hand_lms, mp_hands.HAND_CONNECTIONS)
-            
-            # Başparmak ucu (Landmark 4) ve İşaret parmağı ucu (Landmark 8) koordinatları
-            thumb = hand_lms.landmark[4]
-            index = hand_lms.landmark[8]
-            
-            tx, ty = int(thumb.x * w), int(thumb.y * h)
-            ix, iy = int(index.x * w), int(index.y * h)
-            
-            # Parmak uçlarına daire çiz ve aralarına çizgi çek
-            cv2.circle(img, (tx, ty), 10, (0, 240, 255), cv2.FILLED)
-            cv2.circle(img, (ix, iy), 10, (0, 240, 255), cv2.FILLED)
-            cv2.line(img, (tx, ty), (ix, iy), (0, 240, 255), 3)
-            
-            # İki parmak arasındaki mesafeyi ölç (Hipotenüs)
-            length = math.hypot(ix - tx, iy - ty)
-            
-            # Algılanan mesafeyi Python Ses Aralığına ve Yüzdeye dönüştür
-            # El mesafesi genelde 20px ile 200px arasındadır
-            vol = np.interp(length, [20, 200], [min_vol, max_vol])
-            vol_bar = np.interp(length, [20, 200], [400, 150])
-            vol_per = np.interp(length, [20, 200], [0, 100])
-            
-            # Bilgisayarın ses seviyesini güncelle
-            volume.SetMasterVolumeLevel(vol, None)
-            
-            # Eğer parmaklar çok yakınsa yeşil sinyal ver
-            if length < 25:
-                cv2.circle(img, ((tx + ix) // 2, (ty + iy) // 2), 10, (0, 255, 0), cv2.FILLED)
-
-    # Ekrana Görsel Ses Barları ve Grafikler Çiz
-    cv2.rectangle(img, (50, 150), (85, 400), (255, 0, 0), 3)
-    cv2.rectangle(img, (50, int(vol_bar)), (85, 400), (0, 240, 255), cv2.FILLED)
-    cv2.putText(img, f'{int(vol_per)} %', (40, 450), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 240, 255), 2)
-    
-    cv2.imshow("Muhammed Gazi - AI Ses Kontrolu", img)
-    
-    # Çıkış Kontrolü (Klavyeden 'q' harfine basılırsa)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()</code></pre>
+                <div class="bg-black/20 p-4 border border-purple-950/30 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center"><span class="font-bold text-white">Computer Vision</span><span class="text-cyan-400 font-mono-tech text-xs">80%</span></div>
+                    <div class="w-full h-1.5 bg-purple-950/40 rounded-full overflow-hidden"><div class="h-full bg-cyan-400 rounded-full" style="width: 80%"></div></div>
+                </div>
+                <div class="bg-black/20 p-4 border border-purple-950/30 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center"><span class="font-bold text-white">Three.js / 3D Graphics</span><span class="text-purple-400 font-mono-tech text-xs">75%</span></div>
+                    <div class="w-full h-1.5 bg-purple-950/40 rounded-full overflow-hidden"><div class="h-full bg-purple-500 rounded-full" style="width: 75%"></div></div>
+                </div>
+                <div class="bg-black/20 p-4 border border-purple-950/30 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center"><span class="font-bold text-white">Web Audio / Synthesis</span><span class="text-yellow-400 font-mono-tech text-xs">70%</span></div>
+                    <div class="w-full h-1.5 bg-purple-950/40 rounded-full overflow-hidden"><div class="h-full bg-yellow-400 rounded-full" style="width: 70%"></div></div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-
-    <!-- ==================== SISTEM SCRIPT KODLARI ==================== -->
-    <script>
-        // Air Draw Elementleri
-        const video = document.getElementById('webcam');
-        const drawCanvas = document.getElementById('drawing_canvas');
-        const drawCtx = drawCanvas.getContext('2d');
-        const hudCanvas = document.getElementById('hud_canvas');
-        const hudCtx = hudCanvas.getContext('2d');
-        const logs = document.getElementById('sys-logs');
-
-        let lines = [];
-        let isDrawing = false;
-        let lastPoint = null;
-        let moveOffset = {x: 0, y: 0};
-        
-        const colors = ['#00f0ff', '#ff0055', '#00ff66', '#ffaa00'];
-        let colorIdx = 0;
-        let currentColor = colors[colorIdx];
-
-        // Sanal butonların ekran koordinatları
-        const buttons = [
-            { id: 'CLEAR', x: window.innerWidth - 180, y: 30, w: 150, h: 40 },
-            { id: 'COLOR', x: window.innerWidth - 180, y: 90, w: 150, h: 40 },
-            { id: 'FULLSCREEN', x: window.innerWidth - 180, y: 150, w: 150, h: 40 }
-        ];
-
-        function resize() {
-            drawCanvas.width = window.innerWidth; drawCanvas.height = window.innerHeight;
-            hudCanvas.width = window.innerWidth; hudCanvas.height = window.innerHeight;
-            // Buton koordinatlarını güncelle
-            buttons[0].x = window.innerWidth - 180;
-            buttons[1].x = window.innerWidth - 180;
-            buttons[2].x = window.innerWidth - 180;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        function log(msg) { logs.innerHTML = `[SİSTEM]: Sensörler Aktif<br>[DURUM]: ${msg}`; }
-
-        // Sanal Buton Tıklama Kontrolü
-        function checkButtonClick(x, y) {
-            for (let b of buttons) {
-                if (x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h) {
-                    if (b.id === 'CLEAR') lines = [];
-                    if (b.id === 'COLOR') { colorIdx = (colorIdx + 1) % colors.length; currentColor = colors[colorIdx]; }
-                    if (b.id === 'FULLSCREEN') {
-                        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-                        else document.exitFullscreen();
-                    }
-                    return true; // Tıklandı
-                }
-            }
-            return false;
-        }
-
-        // MediaPipe Sonuçlarını İşleme Fonksiyonu
-        function onResults(results) {
-            // Yükleme ekranını gizle
-            document.getElementById('loader').style.display = 'none';
-
-            // HUD'ı Temizle (Her karede)
-            hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
-            
-            // Çizimleri Ekrana Bas (Kaydırma offseti dahil)
-            drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-            drawCtx.lineWidth = 6;
-            drawCtx.lineCap = 'round';
-            drawCtx.shadowBlur = 15;
-            
-            lines.forEach(line => {
-                drawCtx.strokeStyle = line.color;
-                drawCtx.shadowColor = line.color;
-                drawCtx.beginPath();
-                drawCtx.moveTo((line.start.x * drawCanvas.width) + moveOffset.x, (line.start.y * drawCanvas.height) + moveOffset.y);
-                drawCtx.lineTo((line.end.x * drawCanvas.width) + moveOffset.x, (line.end.y * drawCanvas.height) + moveOffset.y);
-                drawCtx.stroke();
-            });
-
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                const hand = results.multiHandLandmarks[0];
+    <!-- Terminal Contact Section -->
+    <section class="max-w-6xl mx-auto px-6 py-24 w-full border-t border-purple-950/30" id="contact">
+        <div class="bg-black/60 border border-cyan-500/30 rounded-2xl overflow-hidden neon-border-cyan">
+            <!-- Terminal Header -->
+            <div class="bg-black/80 px-4 py-3 border-b border-cyan-500/20 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span class="font-mono-tech text-xs text-cyan-400 ml-4">Terminal: muhammedgazi@stark-os</span>
+                </div>
+                <i class="fa-solid fa-terminal text-cyan-400 text-xs"></i>
+            </div>
+            <!-- Terminal Body -->
+            <div class="p-6 font-mono-tech text-sm space-y-6">
+                <div>
+                    <p class="text-cyan-400">muhammedgazi@stark-os:~$ <span class="text-white">whoami</span></p>
+                    <p class="text-gray-400 mt-1">İsim: Muhammed Gazi | Rol: Gelecek Teknolojileri ve Siber Çözümler Geliştiricisi</p>
+                </div>
                 
-                // Aynalama (Mirroring) İşlemi
-                const mirroredHand = hand.map(lm => ({ x: 1 - lm.x, y: lm.y, z: lm.z }));
+                <form class="space-y-4 pt-4" onsubmit="event.preventDefault(); alert('Mesajınız şifreli kanal üzerinden başarıyla gönderildi!');">
+                    <div>
+                        <p class="text-cyan-400">muhammedgazi@stark-os:~$ <span class="text-white">set-sender-info</span></p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                            <input type="text" value="Muhammed Gazi" readonly class="bg-black/50 border border-purple-950/50 rounded px-4 py-2 text-white focus:outline-none focus:border-cyan-400 font-mono-tech text-xs cursor-not-allowed">
+                            <input type="email" value="muhammedgamer13x@gmail.com" readonly class="bg-black/50 border border-purple-950/50 rounded px-4 py-2 text-white focus:outline-none focus:border-cyan-400 font-mono-tech text-xs cursor-not-allowed">
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-cyan-400">muhammedgazi@stark-os:~$ <span class="text-white">write-secure-message</span></p>
+                        <textarea rows="4" placeholder="Projeniz veya mesajınız hakkında şifreli veri paketi yazın..." required class="w-full mt-2 bg-black/50 border border-purple-950/50 rounded px-4 py-2 text-white focus:outline-none focus:border-cyan-400 font-mono-tech text-xs"></textarea>
+                    </div>
+                    <div>
+                        <button type="submit" class="px-6 py-2.5 rounded bg-cyan-500 hover:bg-cyan-400 text-black font-orbitron font-black tracking-widest text-xs transition-all duration-300 shadow-[0_0_15px_rgba(0,242,254,0.3)]">SEND SECURE DATA</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
 
-                // 1. İSKELET ÇİZİMİ (HUD Katmanı)
-                drawConnectors(hudCtx, mirroredHand, HAND_CONNECTIONS, {color: 'rgba(0, 240, 255, 0.5)', lineWidth: 2});
-                for(let lm of mirroredHand) {
-                    hudCtx.beginPath(); hudCtx.arc(lm.x * hudCanvas.width, lm.y * hudCanvas.height, 3, 0, 2*Math.PI);
-                    hudCtx.fillStyle = '#00f0ff'; hudCtx.fill();
-                }
+    <!-- Footer -->
+    <footer class="border-t border-purple-950/40 bg-black/80 py-12 text-center text-gray-500 text-xs font-mono-tech">
+        <p class="tracking-widest">© 2026 MUHAMMED GAZİ PORTFOLIO. ALL SYSTEMS FUNCTIONAL.</p>
+    </footer>
 
-                // Parmak Uçları ve Koordinatları
-                const index = mirroredHand[8];
-                const thumb = mirroredHand[4];
-                const ix = index.x * hudCanvas.width;
-                const iy = index.y * hudCanvas.height;
-                const tx = thumb.x * hudCanvas.width;
-                const ty = thumb.y * hudCanvas.height;
 
-                // Hedefleme Lazer İmleci
-                hudCtx.beginPath(); hudCtx.arc(ix, iy, 12, 0, 2*Math.PI);
-                hudCtx.strokeStyle = currentColor; hudCtx.lineWidth = 2; hudCtx.stroke();
-                hudCtx.beginPath(); hudCtx.moveTo(ix - 20, iy); hudCtx.lineTo(ix + 20, iy); hudCtx.stroke();
-                hudCtx.beginPath(); hudCtx.moveTo(ix, iy - 20); hudCtx.lineTo(ix, iy + 20); hudCtx.stroke();
+    <!-- ===================================================================== -->
+    <!-- INTERACTIVE SCREEN 1: AIR DRAW PROJECT SCREEN (FULL MODAL) -->
+    <!-- ===================================================================== -->
+    <div id="airDrawModal" class="fixed inset-0 bg-black/95 z-[100] hidden flex flex-col justify-between p-6">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center border-b border-pink-500/30 pb-4">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-2xl animate-pulse"></i>
+                <div>
+                    <h3 class="font-orbitron font-black text-xl text-white neon-text-pink">AIR DRAW AI v1.0</h3>
+                    <p class="font-mono-tech text-[10px] text-pink-400 uppercase tracking-widest">Yapay Zeka Destekli El Çizim Sistemi</p>
+                </div>
+            </div>
+            <!-- Close Button -->
+            <button onclick="closeAirDraw()" class="w-10 h-10 rounded border border-pink-500/30 hover:bg-pink-500/20 text-pink-400 hover:text-white transition-all flex items-center justify-center font-bold text-lg">✕</button>
+        </div>
 
-                // Mesafe ve Yumruk Kontrolü
-                const dist = Math.hypot(ix - tx, iy - ty);
-                const isFist = mirroredHand[12].y > mirroredHand[10].y && mirroredHand[16].y > mirroredHand[14].y && mirroredHand[20].y > mirroredHand[18].y;
-
-                // 2. MOD KONTROLLERİ (Tony Stark Mantığı)
-                if (dist < 35) {
-                    // TAŞIMA VEYA TIKLAMA MODU (İki parmak birleşti)
+        <!-- Video Feed & Workspace Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 my-6 flex-grow overflow-hidden">
+            <!-- Sidebar Panel: Controls & Tech Specs -->
+            <div class="bg-black/50 border border-purple-950/50 p-5 rounded-xl flex flex-col justify-between font-mono-tech text-xs space-y-4">
+                <div class="space-y-4">
+                    <div class="border-b border-purple-950/50 pb-2"><span class="text-pink-500 font-bold">KONTROL PANELİ</span></div>
                     
-                    // İki parmak arasına parlak bir ışık koy (Tıklama efekti)
-                    hudCtx.beginPath(); hudCtx.arc((ix+tx)/2, (iy+ty)/2, 10, 0, 2*Math.PI);
-                    hudCtx.fillStyle = '#ffaa00'; hudCtx.fill();
+                    <!-- System Action Button -->
+                    <button id="airStartBtn" onclick="initMediaPipe()" class="w-full py-3 rounded bg-pink-600 hover:bg-pink-500 text-white font-orbitron font-black tracking-widest transition-all duration-300 shadow-[0_0_15px_rgba(255,0,127,0.3)]">SİSTEMİ BAŞLAT</button>
+                    
+                    <div class="space-y-2 pt-2">
+                        <label class="text-gray-400 block">Fırça Rengi Seçin:</label>
+                        <div class="flex space-x-2">
+                            <button onclick="changeColor('#ff007f')" class="w-8 h-8 rounded-full border border-white/50 bg-[#ff007f] cursor-pointer hover:scale-110 transition-transform"></button>
+                            <button onclick="changeColor('#00f2fe')" class="w-8 h-8 rounded-full border border-white/20 bg-[#00f2fe] cursor-pointer hover:scale-110 transition-transform"></button>
+                            <button onclick="changeColor('#39ff14')" class="w-8 h-8 rounded-full border border-white/20 bg-[#39ff14] cursor-pointer hover:scale-110 transition-transform"></button>
+                            <button onclick="changeColor('#ff0000')" class="w-8 h-8 rounded-full border border-white/20 bg-[#ff0000] cursor-pointer hover:scale-110 transition-transform"></button>
+                        </div>
+                    </div>
 
-                    if (!checkButtonClick((ix+tx)/2, (iy+ty)/2)) {
-                        // Eğer butona tıklamadıysa ekrandaki çizimleri taşı
-                        log("<span class='text-amber-400'>KİLİTLENDİ - TAŞINIYOR</span>");
-                        if (lastPoint) {
-                            moveOffset.x += ix - (lastPoint.x * hudCanvas.width);
-                            moveOffset.y += iy - (lastPoint.y * hudCanvas.height);
+                    <div class="space-y-2">
+                        <label class="text-gray-400 block">Fırça Kalınlığı:</label>
+                        <input type="range" min="2" max="30" value="8" id="brushSize" oninput="changeSize(this.value)" class="w-full h-1 bg-purple-950 rounded-lg appearance-none cursor-pointer accent-pink-500">
+                    </div>
+
+                    <!-- Clean Canvas Button -->
+                    <button onclick="clearCanvas()" class="w-full py-2 bg-purple-950 hover:bg-purple-900 border border-purple-800 rounded text-gray-300 font-bold hover:text-white transition-all">TUALİ TEMİZLE</button>
+                </div>
+
+                <div class="space-y-3 bg-black/80 border border-pink-500/20 p-3 rounded">
+                    <p class="text-pink-400 font-bold"><i class="fa-solid fa-gamepad mr-2"></i> KONTROLLER</p>
+                    <p class="text-gray-400 leading-relaxed text-[11px]">
+                        👉 <b>Çizim:</b> İşaret ve başparmağınızı birbirine birleştirin. <br>
+                        🖐️ <b>Durdur:</b> Parmaklarınızı birbirinden ayırın.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Main Interactive Screen: Video & Overlay Drawing -->
+            <div class="md:col-span-3 flex items-center justify-center relative bg-black border border-pink-500/10 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(255,0,127,0.05)]">
+                <!-- Status Overlay Indicator -->
+                <div id="aiStatusOverlay" class="absolute top-4 left-4 z-20 px-3 py-1 bg-black/80 border border-pink-500/30 rounded text-[11px] font-mono-tech text-pink-400 flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span>
+                    <span id="aiStatusText">DURDURULDU (KAMERA AÇILMALI)</span>
+                </div>
+
+                <!-- Video Element -->
+                <video id="webcam" class="absolute inset-0 w-full h-full object-cover z-0" autoplay playsinline></video>
+                <!-- Drawing Canvas Overlay -->
+                <canvas id="paintCanvas" class="absolute inset-0 w-full h-full z-10" style="mix-blend-mode: screen;"></canvas>
+            </div>
+        </div>
+
+        <!-- Footer Bar of Modal -->
+        <div class="border-t border-purple-950/40 pt-4 flex justify-between items-center text-[10px] font-mono-tech text-gray-500">
+            <span>STARK_OS MODULE DETECTED: [AIR_DRAW_ENGINE]</span>
+            <span class="text-pink-500/50">PRESS ESC TO CLOSE MODULE</span>
+        </div>
+    </div>
+
+
+    <!-- ===================================================================== -->
+    <!-- INTERACTIVE SCREEN 2: CYBER BREAKOUT OYUNU (FULL MODAL) -->
+    <!-- ===================================================================== -->
+    <div id="breakoutModal" class="fixed inset-0 bg-[#020008]/98 z-[100] hidden flex flex-col justify-between p-6">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center border-b border-cyan-500/30 pb-4">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-gamepad text-cyan-400 text-2xl animate-bounce"></i>
+                <div>
+                    <h3 class="font-orbitron font-black text-xl text-white neon-text-cyan">CYBER BREAKOUT</h3>
+                    <p class="font-mono-tech text-[10px] text-cyan-400 uppercase tracking-widest">Retro Atari Klasik - Neon Edition</p>
+                </div>
+            </div>
+            <!-- Close Button -->
+            <button onclick="closeBreakout()" class="w-10 h-10 rounded border border-cyan-500/30 hover:bg-cyan-500/20 text-cyan-400 hover:text-white transition-all flex items-center justify-center font-bold text-lg">✕</button>
+        </div>
+
+        <!-- Game Screen and Panels -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 my-6 flex-grow overflow-hidden">
+            <!-- Sidebar Panel: Game Stats & Help -->
+            <div class="bg-black/60 border border-cyan-500/20 p-5 rounded-xl flex flex-col justify-between font-mono-tech text-xs space-y-4">
+                <div class="space-y-4">
+                    <div class="border-b border-cyan-500/20 pb-2"><span class="text-cyan-400 font-bold">OYUN BİLGİSİ</span></div>
+                    
+                    <div class="space-y-3 font-orbitron text-white">
+                        <div class="bg-cyan-950/20 p-3 border border-cyan-500/10 rounded">
+                            <span class="text-[10px] text-cyan-400 block font-mono-tech">Mevcut Skor:</span>
+                            <span class="text-2xl font-bold text-white tracking-widest" id="breakoutScore">0000</span>
+                        </div>
+                        <div class="bg-pink-950/20 p-3 border border-pink-500/10 rounded">
+                            <span class="text-[10px] text-pink-400 block font-mono-tech">Kalan Hak:</span>
+                            <span class="text-2xl font-bold text-white tracking-widest" id="breakoutLives">❤️❤️❤️</span>
+                        </div>
+                    </div>
+
+                    <button id="breakoutStartBtn" onclick="initBreakoutGame()" class="w-full py-3 rounded bg-cyan-500 hover:bg-cyan-400 text-black font-orbitron font-black tracking-widest transition-all duration-300 shadow-[0_0_15px_rgba(0,242,254,0.3)]">OYUNU BAŞLAT</button>
+                </div>
+
+                <div class="space-y-2 bg-black/80 border border-cyan-500/10 p-3 rounded text-[11px] text-gray-400">
+                    <p class="text-cyan-400 font-bold"><i class="fa-solid fa-bolt mr-1"></i> GÜÇLENDİRİCİLER</p>
+                    <p>🟢 Geniş Palet (Boyut iki katına çıkar)</p>
+                    <p>🔴 Lazer Palet (Sol tıklayarak ateş et)</p>
+                    <p>🟣 Ekstra Top (Sahaya yeni top fırlatır)</p>
+                    <p class="pt-2 text-white border-t border-purple-950/50 mt-2"><b>Fareyi sürükleyerek paleti kaydırın. Sol klik lazer ateşler.</b></p>
+                </div>
+            </div>
+
+            <!-- Game Canvas Container -->
+            <div id="breakoutGameBox" class="md:col-span-3 flex items-center justify-center relative bg-black/80 border border-cyan-500/20 rounded-2xl overflow-hidden cursor-none">
+                <canvas id="breakoutCanvas" width="800" height="500" class="max-w-full max-h-full"></canvas>
+            </div>
+        </div>
+
+        <!-- Footer Bar of Modal -->
+        <div class="border-t border-purple-950/40 pt-4 flex justify-between items-center text-[10px] font-mono-tech text-gray-500">
+            <span>STARK_OS GAME MODULE: [CYBER_BREAKOUT_ENGINE]</span>
+            <span class="text-cyan-500/50">PRESS ESC TO CLOSE GAME</span>
+        </div>
+    </div>
+
+
+    <!-- ===================================================================== -->
+    <!-- INTERACTIVE SCREEN 3: 3D SPACE VOYAGE OYUNU (FULL MODAL) -->
+    <!-- ===================================================================== -->
+    <div id="spaceVoyageModal" class="fixed inset-0 bg-[#020008]/98 z-[100] hidden flex flex-col justify-between p-6">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center border-b border-purple-500/30 pb-4">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-shuttle-space text-purple-400 text-2xl animate-pulse"></i>
+                <div>
+                    <h3 class="font-orbitron font-black text-xl text-white neon-text-pink">3D SPACE VOYAGE</h3>
+                    <p class="font-mono-tech text-[10px] text-purple-400 uppercase tracking-widest">Sanal Uzay Simülatörü ve 3D Yolculuk</p>
+                </div>
+            </div>
+            <!-- Close Button -->
+            <button onclick="closeSpaceVoyage()" class="w-10 h-10 rounded border border-purple-500/30 hover:bg-purple-500/20 text-purple-400 hover:text-white transition-all flex items-center justify-center font-bold text-lg">✕</button>
+        </div>
+
+        <!-- Game Screen and Panels -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 my-6 flex-grow overflow-hidden">
+            <!-- Sidebar Panel: Controls & Telemetry -->
+            <div class="bg-black/60 border border-purple-500/20 p-5 rounded-xl flex flex-col justify-between font-mono-tech text-xs space-y-4">
+                <div class="space-y-4">
+                    <div class="border-b border-purple-500/20 pb-2"><span class="text-purple-400 font-bold">KOKPİT TELEMETRİSİ</span></div>
+                    
+                    <div class="space-y-3 font-orbitron text-white">
+                        <div class="bg-purple-950/20 p-3 border border-purple-500/10 rounded">
+                            <span class="text-[10px] text-purple-400 block font-mono-tech">Motor Gücü:</span>
+                            <span class="text-xl font-bold text-white tracking-widest" id="spaceSpeed">WARP: 1x</span>
+                        </div>
+                        <div class="bg-blue-950/20 p-3 border border-blue-500/10 rounded">
+                            <span class="text-[10px] text-blue-400 block font-mono-tech">Sinyal Kalitesi:</span>
+                            <span class="text-xl font-bold text-white tracking-widest">CONNECT v4</span>
+                        </div>
+                    </div>
+
+                    <button id="spaceVoyageStartBtn" onclick="initSpaceVoyageGame()" class="w-full py-3 rounded bg-purple-600 hover:bg-purple-500 text-white font-orbitron font-black tracking-widest transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.3)]">SİMÜLATÖRÜ AÇ</button>
+                </div>
+
+                <div class="space-y-3 bg-black/80 border border-purple-500/10 p-3 rounded text-[11px] text-gray-400">
+                    <p class="text-purple-400 font-bold"><i class="fa-solid fa-gamepad mr-1"></i> KONTROLLER</p>
+                    <p>⌨️ <b>W - S:</b> İleri / Geri Uç</p>
+                    <p>⌨️ <b>A - D:</b> Sola / Sağa Uç</p>
+                    <p>⚡ <b>SHIFT:</b> Warp Motoru (Hızlı Git)</p>
+                    <p>🖱️ <b>Fare:</b> 360 Derece Etrafa Bakış</p>
+                    <p class="pt-2 text-white border-t border-purple-950/50 mt-2"><b>Ekranın içine tıklayarak uzay geminizi doğrudan kontrol edebilirsiniz!</b></p>
+                </div>
+            </div>
+
+            <!-- 3D Canvas Box -->
+            <div id="spaceVoyageContainer" class="md:col-span-3 flex items-center justify-center relative bg-black border border-purple-500/20 rounded-2xl overflow-hidden cursor-crosshair">
+                <div id="space3DCanvasHolder" class="w-full h-full min-h-[500px]"></div>
+                <!-- Controls Notification Overlay -->
+                <div id="spaceClickPrompt" class="absolute inset-0 bg-black/70 flex flex-col justify-center items-center text-center p-6 z-20 pointer-events-none transition-all duration-300">
+                    <i class="fa-solid fa-hand-pointer text-4xl text-purple-400 mb-4 animate-bounce"></i>
+                    <p class="font-orbitron font-bold text-white text-lg">SİMÜLASYONA KATILMAK İÇİN TIKLAYIN</p>
+                    <p class="text-gray-400 text-xs mt-2 font-mono-tech">Fareniz kilitlenecektir. Çıkmak için "ESC"ye basabilirsiniz.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bar of Modal -->
+        <div class="border-t border-purple-950/40 pt-4 flex justify-between items-center text-[10px] font-mono-tech text-gray-500">
+            <span>STARK_OS GAME MODULE: [THREE_JS_3D_SPACE_ENGINE]</span>
+            <span class="text-purple-500/50">PRESS ESC TO CLOSE SIMULATION</span>
+        </div>
+    </div>
+
+
+    <!-- ===================================================================== -->
+    <!-- GENERAL PORTFOLIO LOGIC AND SYSTEMS SCRIPTS -->
+    <!-- ===================================================================== -->
+    <script>
+        // ESC Key listener to close active systems
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeAirDraw();
+                closeBreakout();
+                closeSpaceVoyage();
+            }
+        });
+    </script>
+
+
+    <!-- ===================================================================== -->
+    <!-- PROJECT 1 SCRIPT: AIR DRAW COMPUTER VISION SYSTEM -->
+    <!-- ===================================================================== -->
+    <!-- MediaPipe files are loaded dynamically when user clicks starting buttons -->
+    <script>
+        let webcamStream = null;
+        let paintCanvas = document.getElementById("paintCanvas");
+        let paintCtx = paintCanvas.getContext("2d");
+        let activeColor = "#ff007f";
+        let brushRadius = 8;
+        let prevPoint = null;
+        let isSystemRunning = false;
+        let videoEl = document.getElementById("webcam");
+
+        // Open/Close Modal
+        function openAirDraw() {
+            document.getElementById("airDrawModal").classList.remove("hidden");
+            resizeCanvas();
+        }
+
+        function closeAirDraw() {
+            document.getElementById("airDrawModal").classList.add("hidden");
+            stopWebcam();
+        }
+
+        function resizeCanvas() {
+            paintCanvas.width = paintCanvas.parentElement.clientWidth;
+            paintCanvas.height = paintCanvas.parentElement.clientHeight;
+            paintCtx.lineCap = "round";
+            paintCtx.lineJoin = "round";
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function changeColor(color) {
+            activeColor = color;
+        }
+
+        function changeSize(size) {
+            brushRadius = size;
+        }
+
+        function clearCanvas() {
+            paintCtx.clearRect(0, 0, paintCanvas.width, paintCanvas.height);
+            prevPoint = null;
+        }
+
+        function stopWebcam() {
+            isSystemRunning = false;
+            document.getElementById("aiStatusText").innerText = "DURDURULDU (KAMERA AÇILMALI)";
+            document.getElementById("airStartBtn").innerText = "SİSTEMİ BAŞLAT";
+            document.getElementById("airStartBtn").className = "w-full py-3 rounded bg-pink-600 hover:bg-pink-500 text-white font-orbitron font-black tracking-widest transition-all duration-300 shadow-[0_0_15px_rgba(255,0,127,0.3)]";
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(track => track.stop());
+                webcamStream = null;
+            }
+            videoEl.srcObject = null;
+        }
+
+        // Lazy Loading and Initializing MediaPipe El Algılama Modülü
+        async function initMediaPipe() {
+            if (isSystemRunning) {
+                stopWebcam();
+                return;
+            }
+
+            document.getElementById("aiStatusText").innerText = "KAMERA VE AI YÜKLENİYOR...";
+            document.getElementById("airStartBtn").innerText = "DURDURULUYOR...";
+            
+            try {
+                // Get User Webcam
+                webcamStream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
+                videoEl.srcObject = webcamStream;
+                isSystemRunning = true;
+                
+                // Dynamically import MediaPipe script libraries
+                await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js");
+                await loadScript("https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js");
+
+                const hands = new Hands({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                });
+
+                hands.setOptions({
+                    maxNumHands: 1,
+                    modelComplexity: 1,
+                    minDetectionConfidence: 0.75,
+                    minTrackingConfidence: 0.75
+                });
+
+                hands.onResults(onHandDetected);
+
+                const camera = new Camera(videoEl, {
+                    onFrame: async () => {
+                        if (isSystemRunning) {
+                            await hands.send({ image: videoEl });
                         }
-                    } else {
-                        log("<span class='text-emerald-400'>KOMUT ONAYLANDI</span>");
+                    },
+                    width: 640,
+                    height: 480
+                });
+                
+                camera.start();
+                document.getElementById("aiStatusText").innerText = "BAĞLANDI: PARMAKLARINIZI KULLANIN!";
+                document.getElementById("airStartBtn").innerText = "SİSTEMİ DURDUR";
+                document.getElementById("airStartBtn").className = "w-full py-3 rounded bg-red-600 hover:bg-red-500 text-white font-orbitron font-black tracking-widest transition-all duration-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]";
+                resizeCanvas();
+            } catch (err) {
+                console.error(err);
+                document.getElementById("aiStatusText").innerText = "HATA: KAMERA BULUNAMADI VEYA İZİN VERİLMEDİ!";
+                document.getElementById("airStartBtn").innerText = "TEKRAR DENE";
+            }
+        }
+
+        // Helper function for dynamic scripts
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                if (document.querySelector(`script[src="${src}"]`)) {
+                    resolve();
+                    return;
+                }
+                const script = document.createElement("script");
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // Logic when MediaPipe process frame
+        function onHandDetected(results) {
+            if (!isSystemRunning) return;
+            
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmark = results.multiHandLandmarks[0];
+                
+                // Landmark points: 
+                // 4: Başparmak ucu, 8: İşaret parmağı ucu
+                const thumbTip = landmark[4];
+                const indexTip = landmark[8];
+
+                // Convert points relative to Canvas dimensions
+                // Remember camera is mirrored!
+                const x = (1 - indexTip.x) * paintCanvas.width;
+                const y = indexTip.y * paintCanvas.height;
+
+                // Calculate Euclidean distance between thumb and index finger tip
+                const distance = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y, thumbTip.z - indexTip.z);
+
+                // Threshold distance: if distance < 0.05, draw line
+                if (distance < 0.05) {
+                    document.getElementById("aiStatusText").innerText = "DURUM: ÇİZİYOR ✍️";
+                    if (prevPoint) {
+                        paintCtx.beginPath();
+                        paintCtx.moveTo(prevPoint.x, prevPoint.y);
+                        paintCtx.lineTo(x, y);
+                        paintCtx.strokeStyle = activeColor;
+                        paintCtx.lineWidth = brushRadius;
+                        paintCtx.stroke();
                     }
-                    lastPoint = {x: index.x, y: index.y};
-                    isDrawing = false;
-                } 
-                else if (isFist && index.y < mirroredHand[6].y) {
-                    // ÇİZİM MODU (Yumruk + İşaret parmağı havada)
-                    log(`<span style='color:${currentColor}'>LAZER AKTİF - ÇİZİLİYOR</span>`);
-                    if (lastPoint && isDrawing) {
-                        lines.push({
-                            start: { x: (lastPoint.x * hudCanvas.width - moveOffset.x) / hudCanvas.width, y: (lastPoint.y * hudCanvas.height - moveOffset.y) / hudCanvas.height },
-                            end: { x: (index.x * hudCanvas.width - moveOffset.x) / hudCanvas.width, y: (index.y * hudCanvas.height - moveOffset.y) / hudCanvas.height },
-                            color: currentColor
-                        });
-                    }
-                    lastPoint = {x: index.x, y: index.y};
-                    isDrawing = true;
-                } 
-                else {
-                    // İZLEME MODU
-                    log("<span class='text-cyan-400'>HEDEF ARANIYOR...</span>");
-                    lastPoint = null;
-                    isDrawing = false;
+                    prevPoint = { x, y };
+                } else {
+                    document.getElementById("aiStatusText").innerText = "DURUM: TAKİP EDİLİYOR 🖐️";
+                    prevPoint = null; // Reset line segment tracking
                 }
             } else {
-                log("<span class='text-red-500'>EL TESPİT EDİLEMEDİ</span>");
-                lastPoint = null;
-                isDrawing = false;
+                document.getElementById("aiStatusText").innerText = "DURUM: EL BULUNAMADI 🔍";
+                prevPoint = null;
             }
         }
-
-        // MediaPipe Yapay Zeka Kurulumu
-        const mpHandsInstance = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-        mpHandsInstance.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-        mpHandsInstance.onResults(onResults);
-
-        let cameraInstance = null;
-
-        // --- SISTEMI BAŞLAT (PORTFOLYODAN GEÇİŞ) ---
-        function startAirDraw() {
-            document.getElementById('portfolio-view').classList.add('hidden');
-            document.getElementById('airdraw-container').style.display = 'block';
-            document.getElementById('loader').style.display = 'flex';
-            resize();
-
-            mpHandsInstance.onResults(onResults); // Air Draw fonksiyonuna yönlendir
-
-            if (!cameraInstance) {
-                cameraInstance = new Camera(video, {
-                    onFrame: async () => { await mpHandsInstance.send({image: video}); },
-                    width: 1280, height: 720
-                });
-            }
-
-            cameraInstance.start().catch(err => {
-                document.getElementById('loader-text').innerHTML = "HATA: Kameraya Erişilemiyor!";
-                document.querySelector('#loader p').innerHTML = "Lütfen tarayıcının adres çubuğundaki kamera ikonuna tıklayıp izin verin, ardından sayfayı yenileyip tekrar deneyin.";
-            });
-        }
-
-        // --- SİSTEMİ KAPAT (PORTFOLYOYA DÖNÜŞ) ---
-        function stopAirDraw() {
-            if (video.srcObject) {
-                video.srcObject.getTracks().forEach(track => track.stop());
-                video.srcObject = null;
-            }
-            if (cameraInstance) {
-                cameraInstance = null;
-            }
-            lines = [];
-            moveOffset = {x: 0, y: 0};
-
-            document.getElementById('airdraw-container').style.display = 'none';
-            document.getElementById('portfolio-view').classList.remove('hidden');
-
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            }
-        }
-
-        // --- PYTHON MODEL AYARLARI ---
-        function openPythonModal() {
-            const modal = document.getElementById('python-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closePythonModal() {
-            const modal = document.getElementById('python-modal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-        }
-
-        function copyCode() {
-            const code = document.getElementById('python-code').innerText;
-            navigator.clipboard.writeText(code).then(() => {
-                const btnText = document.getElementById('copy-text');
-                btnText.innerText = "Kopyalandı!";
-                setTimeout(() => {
-                    btnText.innerText = "Kopyala";
-                }, 2000);
-            });
-        }
+    </script>
 
 
-        // ==========================================
-        //        HTML5 CANVASI RETRO ATARI OYUNU
-        // ==========================================
-        const gameCanvas = document.getElementById('game-canvas');
-        const gCtx = gameCanvas.getContext('2d');
-        let gameLoopId = null;
-        let gameActive = false;
+    <!-- ===================================================================== -->
+    <!-- PROJECT 2 SCRIPT: RETRO CYBER BREAKOUT INTERACTIVE GAME -->
+    <!-- ===================================================================== -->
+    <script>
+        let breakoutCanvas = document.getElementById("breakoutCanvas");
+        let breakoutCtx = breakoutCanvas.getContext("2d");
+        let breakoutAnimationId = null;
+        let isBreakoutActive = false;
 
-        // Oyun Ayarları
+        // Scores and Lives
+        let breakoutScoreValue = 0;
+        let breakoutLivesValue = 3;
+
+        // Game Entities
+        let ball = { x: 400, y: 400, dx: 4, dy: -4, radius: 8 };
+        let paddle = { x: 350, y: 465, width: 100, height: 12, speed: 8, isLaser: false, isWide: false };
         let bricks = [];
         let particles = [];
-        let powerUps = [];
-        let balls = [];
         let lasers = [];
+        let powerups = [];
 
+        // Brick configurations
         const brickRows = 5;
         const brickCols = 9;
-        const brickHeight = 25;
-        const brickGap = 6;
-        const brickWidth = (800 - (brickCols + 1) * brickGap) / brickCols;
+        const brickWidth = 72;
+        const brickHeight = 20;
+        const brickPadding = 10;
+        const brickOffsetTop = 50;
+        const brickOffsetLeft = 35;
 
-        // Palet Ayarları
-        let paddle = {
-            x: 350,
-            y: 460,
-            width: 110,
-            height: 15,
-            color: '#f43f5e',
-            speed: 8,
-            laserTimer: 0,
-            widthTimer: 0
-        };
+        // Custom mouse track handling with clamping (prevents paddle escaping from boundaries)
+        let mouseX = 350;
 
-        // Tuğla Renkleri
-        const brickColors = ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6'];
-
-        // Oyunu Başlat
-        function startArcadeGame() {
-            document.getElementById('portfolio-view').classList.add('hidden');
-            document.getElementById('game-view').style.display = 'flex';
-            
-            initGame();
-            gameActive = true;
-            gameLoop();
+        function openBreakout() {
+            document.getElementById("breakoutModal").classList.remove("hidden");
+            document.addEventListener("mousemove", onBreakoutMouseMove);
+            document.addEventListener("click", onBreakoutMouseClick);
         }
 
-        // Oyundan Çık
-        function stopArcadeGame() {
-            gameActive = false;
-            cancelAnimationFrame(gameLoopId);
-            document.getElementById('game-view').style.display = 'none';
-            document.getElementById('portfolio-view').classList.remove('hidden');
+        function closeBreakout() {
+            document.getElementById("breakoutModal").classList.add("hidden");
+            isBreakoutActive = false;
+            cancelAnimationFrame(breakoutAnimationId);
+            document.removeEventListener("mousemove", onBreakoutMouseMove);
+            document.removeEventListener("click", onBreakoutMouseClick);
+            paddle.isLaser = false;
+            paddle.isWide = false;
+            paddle.width = 100;
         }
 
-        // Oyun Değişkenlerini Sıfırla
-        let score = 0;
-        let lives = 3;
-        let level = 1;
-
-        function initGame() {
-            score = 0;
-            lives = 3;
-            level = 1;
-            paddle.x = 350;
-            paddle.width = 110;
-            paddle.laserTimer = 0;
-            paddle.widthTimer = 0;
-            balls = [{
-                x: 400,
-                y: 440,
-                dx: 4 * (Math.random() > 0.5 ? 1 : -1),
-                dy: -4,
-                radius: 8,
-                color: '#fff',
-                inPlay: false // Tıklayana kadar fırlatılmasın
-            }];
-            bullets = [];
-            powerUps = [];
-            particles = [];
-            lasers = [];
-            createBricks();
+        function onBreakoutMouseMove(e) {
+            let rect = breakoutCanvas.getBoundingClientRect();
+            // Mouse tracking normalized inside canvas bounds
+            mouseX = e.clientX - rect.left;
         }
 
-        function createBricks() {
+        function onBreakoutMouseClick() {
+            if (isBreakoutActive && paddle.isLaser) {
+                // Shoot two lasers from endpoints of paddle
+                lasers.push({ x: paddle.x + 5, y: paddle.y - 10 });
+                lasers.push({ x: paddle.x + paddle.width - 5, y: paddle.y - 10 });
+            }
+        }
+
+        // Initialize levels and structures
+        function initBreakoutGame() {
+            isBreakoutActive = true;
+            breakoutScoreValue = 0;
+            breakoutLivesValue = 3;
+            document.getElementById("breakoutScore").innerText = "0000";
+            document.getElementById("breakoutLives").innerText = "❤️❤️❤️";
+            document.getElementById("breakoutStartBtn").innerText = "OYUNU SIFIRLA";
+
+            // Ball and Paddle reset
+            ball.x = 400;
+            ball.y = 400;
+            ball.dx = 4;
+            ball.dy = -4;
+            paddle.width = 100;
+            paddle.isLaser = false;
+            paddle.isWide = false;
+
+            // Generate Bricks
             bricks = [];
             for (let r = 0; r < brickRows; r++) {
+                bricks[r] = [];
                 for (let c = 0; c < brickCols; c++) {
-                    bricks.push({
-                        x: brickGap + c * (brickWidth + brickGap),
-                        y: 50 + r * (brickHeight + brickGap),
-                        width: brickWidth,
-                        height: brickHeight,
-                        color: brickColors[r],
-                        active: true
-                    });
+                    bricks[r][c] = { x: 0, y: 0, status: 1, type: Math.floor(Math.random() * 5) };
                 }
             }
+
+            particles = [];
+            lasers = [];
+            powerups = [];
+
+            if (breakoutAnimationId) {
+                cancelAnimationFrame(breakoutAnimationId);
+            }
+            gameLoopBreakout();
         }
 
-        // --- İMLEÇ DUVARA ÇARPMA/DIŞARI KAÇMA HATASININ DÜZELTİLDİĞİ YER ---
-        // Mousemove artık sadece canvas içinde değil, tüm ekranda pürüzsüz takip ediyor
-        window.addEventListener('mousemove', (e) => {
-            if (!gameActive) return;
-            const rect = gameCanvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            paddle.x = mouseX - paddle.width / 2;
-            
-            // Sınırlar
-            if (paddle.x < 0) paddle.x = 0;
-            if (paddle.x + paddle.width > gameCanvas.width) paddle.x = gameCanvas.width - paddle.width;
-        });
-
-        // Tıklama ile fırlatma ve ateş etme
-        gameCanvas.addEventListener('mousedown', () => {
-            if (!gameActive) return;
-            // Fırlatılmamış topları fırlat
-            balls.forEach(ball => {
-                if (!ball.inPlay) {
-                    ball.inPlay = true;
-                    ball.dy = -5;
-                    ball.dx = (Math.random() * 4) - 2;
-                }
-            });
-
-            // Lazer aktifse mermi fırlat
-            if (paddle.laserTimer > 0) {
-                lasers.push({ x: paddle.x + 10, y: paddle.y, dy: -8 });
-                lasers.push({ x: paddle.x + paddle.width - 10, y: paddle.y, dy: -8 });
-            }
-        });
-
-        // Dokunmatik Kontrol
-        gameCanvas.addEventListener('touchmove', (e) => {
-            const rect = gameCanvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            const mouseX = touch.clientX - rect.left;
-            paddle.x = mouseX - paddle.width / 2;
-
-            if (paddle.x < 0) paddle.x = 0;
-            if (paddle.x + paddle.width > gameCanvas.width) paddle.x = gameCanvas.width - paddle.width;
-            e.preventDefault();
-        }, { passive: false });
-
-        // Parçacık Patlama Efekti
+        // Spawn particles upon brick breaking
         function createExplosion(x, y, color) {
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 15; i++) {
                 particles.push({
                     x: x,
                     y: y,
                     dx: (Math.random() - 0.5) * 6,
                     dy: (Math.random() - 0.5) * 6,
                     radius: Math.random() * 3 + 1,
-                    color: color,
                     alpha: 1,
-                    decay: Math.random() * 0.02 + 0.01
+                    color: color
                 });
             }
         }
 
-        // Ana Güncelleme Döngüsü
-        function update() {
-            // Lazer ve Genişlik Süreç Takibi
-            if (paddle.laserTimer > 0) paddle.laserTimer--;
-            if (paddle.widthTimer > 0) {
-                paddle.widthTimer--;
-                if (paddle.widthTimer === 0) paddle.width = 110; // Boyutu normale döndür
+        // Collision Check Helper
+        function checkCollision(ball, brick) {
+            return ball.x + ball.radius > brick.x &&
+                   ball.x - ball.radius < brick.x + brickWidth &&
+                   ball.y + ball.radius > brick.y &&
+                   ball.y - ball.radius < brick.y + brickHeight;
+        }
+
+        // Main game frame update loop
+        function gameLoopBreakout() {
+            if (!isBreakoutActive) return;
+
+            // Clear Screen with trailing black shade (gives faint tail path)
+            breakoutCtx.fillStyle = "rgba(2, 0, 8, 0.3)";
+            breakoutCtx.fillRect(0, 0, breakoutCanvas.width, breakoutCanvas.height);
+
+            // 1. Move and Clamp Paddle with boundary guards
+            paddle.x = mouseX - paddle.width / 2;
+            if (paddle.x < 0) paddle.x = 0;
+            if (paddle.x + paddle.width > breakoutCanvas.width) paddle.x = breakoutCanvas.width - paddle.width;
+
+            // Draw Paddle
+            breakoutCtx.fillStyle = paddle.isLaser ? "#ef4444" : (paddle.isWide ? "#10b981" : "#00f2fe");
+            breakoutCtx.shadowColor = breakoutCtx.fillStyle;
+            breakoutCtx.shadowBlur = 15;
+            breakoutCtx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+            breakoutCtx.shadowBlur = 0;
+
+            // 2. Physics / Move Ball
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Left/Right Wall Bounce
+            if (ball.x - ball.radius <= 0 || ball.x + ball.radius >= breakoutCanvas.width) {
+                ball.dx = -ball.dx;
+            }
+            // Top Ceiling Bounce
+            if (ball.y - ball.radius <= 0) {
+                ball.dy = -ball.dy;
             }
 
-            // Topların Hareketi
-            balls.forEach((ball, bIdx) => {
-                if (!ball.inPlay) {
-                    ball.x = paddle.x + paddle.width / 2;
-                    ball.y = paddle.y - ball.radius - 2;
-                    return;
+            // Paddle Intersection Bounce
+            if (ball.y + ball.radius >= paddle.y && 
+                ball.x > paddle.x && 
+                ball.x < paddle.x + paddle.width) {
+                // Determine strike angle depending on intersection center
+                let hitPoint = (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
+                ball.dx = hitPoint * 5;
+                ball.dy = -Math.abs(ball.dy);
+            }
+
+            // Bottom Boundary Reset (Lose Life)
+            if (ball.y + ball.radius >= breakoutCanvas.height) {
+                breakoutLivesValue--;
+                if (breakoutLivesValue <= 0) {
+                    document.getElementById("breakoutLives").innerText = "GAMEOVER";
+                    alert("OYUN BİTTİ! Skorun: " + breakoutScoreValue);
+                    isBreakoutActive = false;
+                    document.getElementById("breakoutStartBtn").innerText = "YENİDEN BAŞLAT";
+                } else {
+                    document.getElementById("breakoutLives").innerText = "❤️".repeat(breakoutLivesValue);
+                    ball.x = 400;
+                    ball.y = 400;
+                    ball.dx = 4;
+                    ball.dy = -4;
+                    paddle.isWide = false;
+                    paddle.isLaser = false;
+                    paddle.width = 100;
+                }
+            }
+
+            // Draw Ball
+            breakoutCtx.beginPath();
+            breakoutCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            breakoutCtx.fillStyle = "#ffffff";
+            breakoutCtx.shadowColor = "#ffffff";
+            breakoutCtx.shadowBlur = 10;
+            breakoutCtx.fill();
+            breakoutCtx.shadowBlur = 0;
+
+            // 3. Move/Collide Lasers
+            for (let l = lasers.length - 1; l >= 0; l--) {
+                lasers[l].y -= 8;
+                breakoutCtx.fillStyle = "#ff0000";
+                breakoutCtx.fillRect(lasers[l].x, lasers[l].y, 3, 10);
+
+                if (lasers[l].y < 0) {
+                    lasers.splice(l, 1);
+                    continue;
                 }
 
-                ball.x += ball.dx;
-                ball.y += ball.dy;
-
-                // Duvarlara Çarpma (Sol ve Sağ)
-                if (ball.x - ball.radius < 0) {
-                    ball.x = ball.radius;
-                    ball.dx = -ball.dx;
-                }
-                if (ball.x + ball.radius > gameCanvas.width) {
-                    ball.x = gameCanvas.width - ball.radius;
-                    ball.dx = -ball.dx;
-                }
-
-                // Tavan Çarpması
-                if (ball.y - ball.radius < 0) {
-                    ball.y = ball.radius;
-                    ball.dy = -ball.dy;
-                }
-
-                // Alt Tarafa Düşme (Ölüm)
-                if (ball.y + ball.radius > gameCanvas.height) {
-                    balls.splice(bIdx, 1);
-                    if (balls.length === 0) {
-                        lives--;
-                        paddle.laserTimer = 0;
-                        paddle.widthTimer = 0;
-                        paddle.width = 110;
-                        if (lives <= 0) {
-                            alert("OYUN BİTTİ! Skorun: " + score);
-                            initGame();
-                        } else {
-                            balls.push({
-                                x: paddle.x + paddle.width / 2,
-                                y: paddle.y - 10,
-                                dx: 0,
-                                dy: 0,
-                                radius: 8,
-                                color: '#fff',
-                                inPlay: false
-                            });
+                // Check laser hits
+                let hitSomething = false;
+                for (let r = 0; r < brickRows; r++) {
+                    for (let c = 0; c < brickCols; c++) {
+                        let b = bricks[r][c];
+                        if (b.status === 1) {
+                            if (lasers[l].x > b.x && lasers[l].x < b.x + brickWidth &&
+                                lasers[l].y > b.y && lasers[l].y < b.y + brickHeight) {
+                                b.status = 0;
+                                hitSomething = true;
+                                breakoutScoreValue += 20;
+                                document.getElementById("breakoutScore").innerText = breakoutScoreValue.toString().padStart(4, '0');
+                                createExplosion(b.x + brickWidth/2, b.y + brickHeight/2, "#ff0000");
+                                break;
+                            }
                         }
                     }
-                    return;
+                    if (hitSomething) break;
                 }
+                if (hitSomething) {
+                    lasers.splice(l, 1);
+                }
+            }
 
-                // Palete Çarpma
-                if (ball.y + ball.radius >= paddle.y && ball.y - ball.radius <= paddle.y + paddle.height &&
-                    ball.x >= paddle.x && ball.x <= paddle.x + paddle.width) {
+            // 4. Update Power-ups
+            for (let p = powerups.length - 1; p >= 0; p--) {
+                powerups[p].y += 2;
+                
+                // Color mapping
+                let pColor = powerups[p].type === 'wide' ? "#10b981" : (powerups[p].type === 'laser' ? "#ef4444" : "#a855f7");
+                breakoutCtx.beginPath();
+                breakoutCtx.arc(powerups[p].x, powerups[p].y, 10, 0, Math.PI * 2);
+                breakoutCtx.fillStyle = pColor;
+                breakoutCtx.fill();
+
+                // Intersect Paddle
+                if (powerups[p].y + 10 >= paddle.y && 
+                    powerups[p].x > paddle.x && 
+                    powerups[p].x < paddle.x + paddle.width) {
                     
-                    ball.dy = -Math.abs(ball.dy); // Yukarı zıplat
-                    // Çarpılan noktaya göre eğim ver
-                    let hitPoint = (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
-                    ball.dx = hitPoint * 6;
+                    if (powerups[p].type === 'wide') {
+                        paddle.isWide = true;
+                        paddle.width = 180;
+                        setTimeout(() => { paddle.width = 100; paddle.isWide = false; }, 8000);
+                    } else if (powerups[p].type === 'laser') {
+                        paddle.isLaser = true;
+                        setTimeout(() => { paddle.isLaser = false; }, 8000);
+                    } else if (powerups[p].type === 'ball') {
+                        // Spawn random reflection ball
+                        ball.dx += (Math.random() - 0.5) * 4;
+                    }
+
+                    powerups.splice(p, 1);
+                    continue;
                 }
 
-                // Tuğlalara Çarpma Kontrolü
-                bricks.forEach(brick => {
-                    if (brick.active) {
-                        if (ball.x + ball.radius >= brick.x && ball.x - ball.radius <= brick.x + brick.width &&
-                            ball.y + ball.radius >= brick.y && ball.y - ball.radius <= brick.y + brick.height) {
-                            
-                            brick.active = false;
-                            score += 10;
-                            createExplosion(brick.x + brick.width / 2, brick.y + brick.height / 2, brick.color);
-                            ball.dy = -ball.dy;
+                if (powerups[p].y > breakoutCanvas.height) {
+                    powerups.splice(p, 1);
+                }
+            }
 
-                            // Rastgele Güçlendirici Düşürme (%15 şans)
-                            if (Math.random() < 0.20) {
-                                const types = ['WIDE', 'LASER', 'MULTIBALL'];
-                                const randomType = types[Math.floor(Math.random() * types.length)];
-                                powerUps.push({
-                                    x: brick.x + brick.width / 2,
-                                    y: brick.y + brick.height,
-                                    type: randomType,
-                                    radius: 12,
-                                    speed: 2.5
+            // 5. Build/Draw Bricks & Collide Ball
+            let brickLeftToWin = 0;
+            for (let r = 0; r < brickRows; r++) {
+                for (let c = 0; c < brickCols; c++) {
+                    let b = bricks[r][c];
+                    if (b.status === 1) {
+                        brickLeftToWin++;
+                        b.x = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                        b.y = r * (brickHeight + brickPadding) + brickOffsetTop;
+
+                        // Brick Render Styles depending on index row
+                        let colors = ["#ff007f", "#00f2fe", "#39ff14", "#ffff00", "#ff007f"];
+                        breakoutCtx.fillStyle = colors[r];
+                        breakoutCtx.fillRect(b.x, b.y, brickWidth, brickHeight);
+
+                        // Ball collision check
+                        if (checkCollision(ball, b)) {
+                            b.status = 0;
+                            ball.dy = -ball.dy;
+                            breakoutScoreValue += 10;
+                            document.getElementById("breakoutScore").innerText = breakoutScoreValue.toString().padStart(4, '0');
+                            createExplosion(b.x + brickWidth / 2, b.y + brickHeight / 2, colors[r]);
+
+                            // Probability to drop powerup
+                            if (Math.random() < 0.25) {
+                                let types = ['wide', 'laser', 'ball'];
+                                powerups.push({
+                                    x: b.x + brickWidth / 2,
+                                    y: b.y + brickHeight,
+                                    type: types[Math.floor(Math.random() * types.length)]
                                 });
                             }
                         }
                     }
-                });
-            });
+                }
+            }
 
-            // Lazer Mermilerini Güncelle
-            lasers.forEach((laser, lIdx) => {
-                laser.y += laser.dy;
-                // Sınırdan çıktıysa sil
-                if (laser.y < 0) lasers.splice(lIdx, 1);
+            // Check Win Condition
+            if (brickLeftToWin === 0 && isBreakoutActive) {
+                alert("TEBRİKLER, SİSTEMİ TEMİZLEDİN! Toplam Skorun: " + breakoutScoreValue);
+                isBreakoutActive = false;
+                document.getElementById("breakoutStartBtn").innerText = "TEKRAR OYNA";
+            }
 
-                // Tuğlaya vurdu mu?
-                bricks.forEach(brick => {
-                    if (brick.active && laser.x >= brick.x && laser.x <= brick.x + brick.width &&
-                        laser.y >= brick.y && laser.y <= brick.y + brick.height) {
-                        
-                        brick.active = false;
-                        score += 10;
-                        createExplosion(brick.x + brick.width / 2, brick.y + brick.height / 2, brick.color);
-                        lasers.splice(lIdx, 1);
-                    }
-                });
-            });
+            // 6. Draw particles
+            for (let p = particles.length - 1; p >= 0; p--) {
+                particles[p].x += particles[p].dx;
+                particles[p].y += particles[p].dy;
+                particles[p].alpha -= 0.02;
 
-            // Güçlendiricileri Güncelle
-            powerUps.forEach((p, pIdx) => {
-                p.y += p.speed;
-
-                // Palet yakaladı mı?
-                if (p.y + p.radius >= paddle.y && p.y - p.radius <= paddle.y + paddle.height &&
-                    p.x >= paddle.x && p.x <= paddle.x + paddle.width) {
-                    
-                    // Güçlendiriciyi Aktif Et
-                    if (p.type === 'WIDE') {
-                        paddle.width = 180;
-                        paddle.widthTimer = 400; // Yaklaşık 7 saniye
-                    } else if (p.type === 'LASER') {
-                        paddle.laserTimer = 400;
-                    } else if (p.type === 'MULTIBALL') {
-                        // Sahaya 2 yeni top ekle
-                        balls.push({
-                            x: paddle.x + paddle.width / 2, y: paddle.y - 12,
-                            dx: (Math.random() * 6) - 3, dy: -5,
-                            radius: 8, color: '#fff', inPlay: true
-                        });
-                        balls.push({
-                            x: paddle.x + paddle.width / 2, y: paddle.y - 12,
-                            dx: (Math.random() * 6) - 3, dy: -5,
-                            radius: 8, color: '#fff', inPlay: true
-                        });
-                    }
-                    powerUps.splice(pIdx, 1);
+                if (particles[p].alpha <= 0) {
+                    particles.splice(p, 1);
+                    continue;
                 }
 
-                // Ekrandan çıktıysa sil
-                if (p.y > gameCanvas.height) powerUps.splice(pIdx, 1);
-            });
-
-            // Parçacıkları Güncelle
-            particles.forEach((part, index) => {
-                part.x += part.dx;
-                part.y += part.dy;
-                part.alpha -= part.decay;
-                if (part.alpha <= 0) particles.splice(index, 1);
-            });
-
-            // Seviye Atlama Kontrolü (Tüm tuğlar kırıldıysa)
-            if (bricks.every(b => !b.active)) {
-                level++;
-                createBricks();
-                balls.forEach(ball => {
-                    ball.inPlay = false;
-                    ball.x = paddle.x + paddle.width / 2;
-                    ball.y = paddle.y - 10;
-                });
+                breakoutCtx.save();
+                breakoutCtx.globalAlpha = particles[p].alpha;
+                breakoutCtx.beginPath();
+                breakoutCtx.arc(particles[p].x, particles[p].y, particles[p].radius, 0, Math.PI * 2);
+                breakoutCtx.fillStyle = particles[p].color;
+                breakoutCtx.fill();
+                breakoutCtx.restore();
             }
+
+            breakoutAnimationId = requestAnimationFrame(gameLoopBreakout);
+        }
+    </script>
+
+
+    <!-- ===================================================================== -->
+    <!-- PROJECT 3 SCRIPT: 3D SPACE VOYAGE THREE.JS ENGINE -->
+    <!-- ===================================================================== -->
+    <script>
+        let spaceScene, spaceCamera, spaceRenderer;
+        let spaceStars, spaceAsteroids = [];
+        let isSpaceActive = false;
+        let spaceClock = new THREE.Clock();
+        
+        // Flight mechanics parameters
+        let moveForward = false;
+        let moveBackward = false;
+        let moveLeft = false;
+        let moveRight = false;
+        let speedBoost = false;
+
+        let spaceVelocity = new THREE.Vector3();
+        let spaceDirection = new THREE.Vector3();
+
+        // Looking mouse coordinates
+        let mouseLookX = 0;
+        let mouseLookY = 0;
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+
+        function openSpaceVoyage() {
+            document.getElementById("spaceVoyageModal").classList.remove("hidden");
+            // Automatically prompt click to bind controls
+            document.getElementById("spaceClickPrompt").style.opacity = "1";
+            document.getElementById("spaceClickPrompt").style.pointerEvents = "auto";
         }
 
-        // Çizim Fonksiyonu
-        function draw() {
-            // Arka Plan Temizliği
-            gCtx.fillStyle = '#020617';
-            gCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
-
-            // Tuğlaları Çiz
-            bricks.forEach(brick => {
-                if (brick.active) {
-                    gCtx.shadowBlur = 10;
-                    gCtx.shadowColor = brick.color;
-                    gCtx.fillStyle = brick.color;
-                    gCtx.fillRect(brick.x, brick.y, brick.width, brick.height);
-                    
-                    // İç detay parıltı çizgisi
-                    gCtx.shadowBlur = 0;
-                    gCtx.fillStyle = 'rgba(255,255,255,0.3)';
-                    gCtx.fillRect(brick.x, brick.y, brick.width, 3);
-                }
-            });
-
-            // Paleti Çiz (Lazer veya Geniş moduna göre renk)
-            gCtx.shadowBlur = 15;
-            let currentPaddleColor = paddle.color;
-            if (paddle.laserTimer > 0) currentPaddleColor = '#f43f5e'; // Kırmızı lazer modu
-            else if (paddle.widthTimer > 0) currentPaddleColor = '#10b981'; // Yeşil geniş mod
-
-            gCtx.shadowColor = currentPaddleColor;
-            gCtx.fillStyle = currentPaddleColor;
-            gCtx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
-            gCtx.shadowBlur = 0;
-
-            // Lazer Mermilerini Çiz
-            lasers.forEach(laser => {
-                gCtx.fillStyle = '#ef4444';
-                gCtx.shadowColor = '#ef4444';
-                gCtx.shadowBlur = 10;
-                gCtx.fillRect(laser.x - 2, laser.y, 4, 15);
-                gCtx.shadowBlur = 0;
-            });
-
-            // Topları Çiz
-            balls.forEach(ball => {
-                gCtx.beginPath();
-                gCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-                gCtx.fillStyle = ball.color;
-                gCtx.shadowColor = ball.color;
-                gCtx.shadowBlur = 12;
-                gCtx.fill();
-                gCtx.shadowBlur = 0;
-            });
-
-            // Güçlendiricileri Çiz
-            powerUps.forEach(p => {
-                gCtx.beginPath();
-                gCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                
-                let pColor = '#fff';
-                let pLabel = 'P';
-                if (p.type === 'WIDE') { pColor = '#10b981'; pLabel = '↔'; }
-                else if (p.type === 'LASER') { pColor = '#f43f5e'; pLabel = '▲'; }
-                else if (p.type === 'MULTIBALL') { pColor = '#a855f7'; pLabel = '●'; }
-
-                gCtx.fillStyle = pColor;
-                gCtx.shadowColor = pColor;
-                gCtx.shadowBlur = 15;
-                gCtx.fill();
-
-                // Güçlendirici İkonu/Yazısı
-                gCtx.shadowBlur = 0;
-                gCtx.fillStyle = '#000';
-                gCtx.font = 'bold 12px Courier New';
-                gCtx.textAlign = 'center';
-                gCtx.textBaseline = 'middle';
-                gCtx.fillText(pLabel, p.x, p.y);
-            });
-
-            // Parçacıkları Çiz
-            particles.forEach(p => {
-                gCtx.save();
-                gCtx.globalAlpha = p.alpha;
-                gCtx.beginPath();
-                gCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                gCtx.fillStyle = p.color;
-                gCtx.fill();
-                gCtx.restore();
-            });
-
-            // Skor, Seviye ve Can Bilgileri
-            gCtx.fillStyle = '#fff';
-            gCtx.font = 'bold 16px Share Tech Mono, Courier New';
-            gCtx.textAlign = 'left';
-            gCtx.fillText(`SKOR: ${score}`, 20, 30);
-            gCtx.fillText(`SEVİYE: ${level}`, 380, 30);
-            gCtx.fillText(`CAN: ${'❤️ '.repeat(lives)}`, 680, 30);
-
-            // Özel Aktif Mod Durum Yazısı
-            if (paddle.laserTimer > 0) {
-                gCtx.fillStyle = '#f43f5e';
-                gCtx.font = '12px Share Tech Mono';
-                gCtx.fillText(`LAZER MODU AKTİF [${Math.ceil(paddle.laserTimer/60)}s]`, 20, 490);
-            } else if (paddle.widthTimer > 0) {
-                gCtx.fillStyle = '#10b981';
-                gCtx.font = '12px Share Tech Mono';
-                gCtx.fillText(`PALET GENİŞLETİLDİ [${Math.ceil(paddle.widthTimer/60)}s]`, 20, 490);
-            }
+        function closeSpaceVoyage() {
+            document.getElementById("spaceVoyageModal").classList.add("hidden");
+            isSpaceActive = false;
+            stopSpaceVoyage();
         }
 
-        // Oyun Döngüsü
-        function gameLoop() {
-            if (gameActive) {
-                update();
-                draw();
-                gameLoopId = requestAnimationFrame(gameLoop);
-            }
-        }
-
-
-
-        // ==========================================
-        //         AI AUDIO LAB SİSTEM KODLARI
-        // ==========================================
-        let audioCtx = null;
-        let synthInterval = null;
-        let masterGain = null;
-        let filterNode = null;
-        let analyserNode = null;
-        let isPlayingSynth = false;
-        let isAISynthActive = false;
-        let audioVideo = document.getElementById('audio-webcam');
-
-        const audioCanvas = document.getElementById('visualizer-canvas');
-        const aCanvasCtx = audioCanvas.getContext('2d');
-        let drawVisualId = null;
-
-        // Fütüristik Synth Kodları
-        function startSynth() {
-            if (isPlayingSynth) return;
+        function stopSpaceVoyage() {
+            // Clean up keyboard events
+            document.removeEventListener('keydown', onSpaceKeyDown);
+            document.removeEventListener('keyup', onSpaceKeyUp);
+            document.removeEventListener('mousemove', onSpaceMouseMove);
             
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            masterGain = audioCtx.createGain();
-            masterGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            // Clear Three.js canvas container to allow reinits
+            const holder = document.getElementById("space3DCanvasHolder");
+            while (holder.firstChild) {
+                holder.removeChild(holder.firstChild);
+            }
+        }
 
-            filterNode = audioCtx.createBiquadFilter();
-            filterNode.type = 'lowpass';
-            filterNode.frequency.setValueAtTime(800, audioCtx.currentTime);
-            filterNode.Q.setValueAtTime(4, audioCtx.currentTime);
-
-            analyserNode = audioCtx.createAnalyser();
-            analyserNode.fftSize = 128;
-
-            // Bağlantılar
-            filterNode.connect(analyserNode);
-            analyserNode.connect(masterGain);
-            masterGain.connect(audioCtx.destination);
-
-            let step = 0;
-            const bassline = [110, 110, 130, 110, 146, 110, 165, 130]; // Cyberpunk Bass Arpeggiator (A-C-D-E)
-
-            synthInterval = setInterval(() => {
-                if (!audioCtx) return;
-
-                // 1. Ana Bass Sesi
-                let osc = audioCtx.createOscillator();
-                let oscGain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(bassline[step % bassline.length] / 2, audioCtx.currentTime);
-                oscGain.gain.setValueAtTime(0.35, audioCtx.currentTime);
-                oscGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
-                
-                osc.connect(oscGain);
-                oscGain.connect(filterNode);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.25);
-
-                // 2. Lead Melodi (4 Adımda bir tetiklenir)
-                if (step % 4 === 0) {
-                    let leadOsc = audioCtx.createOscillator();
-                    let leadGain = audioCtx.createGain();
-                    leadOsc.type = 'triangle';
-                    leadOsc.frequency.setValueAtTime(bassline[step % bassline.length] * 2, audioCtx.currentTime);
-                    leadGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-                    leadGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
-                    
-                    leadOsc.connect(leadGain);
-                    leadGain.connect(filterNode);
-                    leadOsc.start();
-                    leadOsc.stop(audioCtx.currentTime + 0.5);
-                }
-
-                step++;
-            }, 220); // 130 BPM temposunda
-
-            isPlayingSynth = true;
-            document.getElementById('synth-play-icon').className = "fa-solid fa-square";
-            document.getElementById('synth-play-text').innerText = "Sentezleyiciyi Durdur";
-            document.getElementById('audio-status-log').innerHTML = "<span class='text-emerald-400'>SENTEZLEYİCİ AKTİF - SES AKIŞI BAŞLADI</span>";
+        // Setup mouse click bound control on canvas element
+        document.getElementById("spaceVoyageContainer").addEventListener("click", function() {
+            if (!isSpaceActive) return; // Wait until simulator starts
             
-            visualizeSpectrum();
-        }
+            // Hide trigger hint
+            document.getElementById("spaceClickPrompt").style.opacity = "0";
+            document.getElementById("spaceClickPrompt").style.pointerEvents = "none";
 
-        function stopSynth() {
-            if (!isPlayingSynth) return;
-            clearInterval(synthInterval);
-            cancelAnimationFrame(drawVisualId);
-            if (audioCtx) {
-                audioCtx.close();
-                audioCtx = null;
-            }
-            isPlayingSynth = false;
-            document.getElementById('synth-play-icon').className = "fa-solid fa-play";
-            document.getElementById('synth-play-text').innerText = "Sentezleyiciyi Çalıştır";
-            document.getElementById('audio-status-log').innerHTML = "<span class='text-gray-400'>Müzik Bekliyor... Sentezleyiciyi çalıştırın.</span>";
-        }
+            // Bind inputs
+            document.addEventListener('keydown', onSpaceKeyDown);
+            document.addEventListener('keyup', onSpaceKeyUp);
+            document.addEventListener('mousemove', onSpaceMouseMove);
+        });
 
-        function toggleSynthPlay() {
-            if (isPlayingSynth) stopSynth();
-            else startSynth();
-        }
-
-        // Manuel Sürgü Güncellemeleri
-        function updateSynthParams() {
-            if (!isPlayingSynth) return;
+        function initSpaceVoyageGame() {
+            isSpaceActive = true;
+            document.getElementById("spaceVoyageStartBtn").innerText = "SİMÜLASYONU YENİLE";
             
-            const vol = parseFloat(document.getElementById('slider-vol').value);
-            const freq = parseFloat(document.getElementById('slider-freq').value);
+            // Hide splash click hint
+            document.getElementById("spaceClickPrompt").style.opacity = "1";
+            document.getElementById("spaceClickPrompt").style.pointerEvents = "auto";
 
-            masterGain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            filterNode.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            // Clean previous
+            stopSpaceVoyage();
 
-            document.getElementById('val-synth-vol').innerText = `${Math.round(vol * 100)}%`;
-            document.getElementById('val-synth-freq').innerText = `${freq} Hz`;
-        }
+            // Set up 3D Canvas Box
+            const container = document.getElementById("space3DCanvasHolder");
+            const width = container.clientWidth;
+            const height = container.clientHeight || 500;
 
-        // Fütüristik Dalga Formu Çizimi
-        function visualizeSpectrum() {
-            if (!isPlayingSynth) return;
+            // 1. Setup Three.js Scene, Camera & Renderer
+            spaceScene = new THREE.Scene();
+            // Fog effect to add depth to space Voyage
+            spaceScene.fog = new THREE.FogExp2(0x020008, 0.0015);
 
-            const bufferLength = analyserNode.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
+            spaceCamera = new THREE.PerspectiveCamera(60, width / height, 1, 2000);
+            spaceCamera.position.set(0, 0, 100);
 
-            function drawWave() {
-                if (!isPlayingSynth) return;
-                drawVisualId = requestAnimationFrame(drawWave);
+            spaceRenderer = new THREE.WebGLRenderer({ antialias: true });
+            spaceRenderer.setSize(width, height);
+            spaceRenderer.setClearColor(0x020008, 1);
+            container.appendChild(spaceRenderer.domElement);
 
-                analyserNode.getByteFrequencyData(dataArray);
+            // 2. Add Lighting
+            const ambientLight = new THREE.AmbientLight(0x222233);
+            spaceScene.add(ambientLight);
 
-                aCanvasCtx.fillStyle = 'rgba(5, 5, 16, 0.3)';
-                aCanvasCtx.fillRect(0, 0, audioCanvas.width, audioCanvas.height);
+            const dirLight1 = new THREE.DirectionalLight(0xff00ff, 1.5);
+            dirLight1.position.set(1, 1, 1).normalize();
+            spaceScene.add(dirLight1);
 
-                const barWidth = (audioCanvas.width / bufferLength) * 1.5;
-                let barHeight;
-                let x = 0;
+            const dirLight2 = new THREE.DirectionalLight(0x00f2fe, 1.5);
+            dirLight2.position.set(-1, -1, 1).normalize();
+            spaceScene.add(dirLight2);
 
-                for (let i = 0; i < bufferLength; i++) {
-                    barHeight = dataArray[i] * 0.8;
+            // 3. Populate Stars (Parıldayan Uzay Tozu)
+            const starCount = 3000;
+            const starGeometry = new THREE.BufferGeometry();
+            const starPositions = new Float32Array(starCount * 3);
+            const starColors = new Float32Array(starCount * 3);
 
-                    // Neon Efekti
-                    aCanvasCtx.fillStyle = `rgba(16, 185, 129, ${barHeight / 150})`;
-                    aCanvasCtx.shadowBlur = 10;
-                    aCanvasCtx.shadowColor = '#10b981';
-                    aCanvasCtx.fillRect(x, audioCanvas.height - barHeight, barWidth - 2, barHeight);
+            for (let i = 0; i < starCount * 3; i += 3) {
+                // Sphere distributed positions
+                starPositions[i] = (Math.random() - 0.5) * 1500;
+                starPositions[i + 1] = (Math.random() - 0.5) * 1500;
+                starPositions[i + 2] = (Math.random() - 0.5) * 1500;
 
-                    x += barWidth;
-                }
-                aCanvasCtx.shadowBlur = 0; // Gölge temizliği
+                // Color tint mix (Cyan to Magenta)
+                starColors[i] = Math.random() > 0.5 ? 1.0 : 0.0;     // Red
+                starColors[i + 1] = Math.random() * 0.8;             // Green
+                starColors[i + 2] = 1.0;                             // Blue
             }
 
-            audioCanvas.width = audioCanvas.parentNode.clientWidth;
-            audioCanvas.height = 220;
-            drawWave();
-        }
+            starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+            starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
 
-        // AI Modu El Algılama Tetikleyicisi
-        function onAudioResults(results) {
-            if (!isAISynthActive) return;
+            const starMaterial = new THREE.PointsMaterial({
+                size: 2.5,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8
+            });
 
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                const hand = results.multiHandLandmarks[0];
+            spaceStars = new THREE.Points(starGeometry, starMaterial);
+            spaceScene.add(spaceStars);
+
+            // 4. Generate 3D Asteroids (Tıklanabilir Engeller)
+            spaceAsteroids = [];
+            const asteroidCount = 40;
+            for (let i = 0; i < asteroidCount; i++) {
+                // Lowpoly spherical asteroid geometries
+                const radius = Math.random() * 12 + 4;
+                const geometry = new THREE.DodecahedronGeometry(radius, 1);
                 
-                const thumb = hand[4];
-                const index = hand[8];
-
-                // Mesafe hesabı (X ve Y koordinatlarına göre hipotenüs)
-                const dist = Math.hypot(index.x - thumb.x, index.y - thumb.y);
-
-                // Mesafeyi Sürgü Limitlerine Dönüştürme (0.05 ile 0.45 arası el mesafesi)
-                let mappedVol = (dist - 0.05) / 0.40;
-                if (mappedVol < 0) mappedVol = 0;
-                if (mappedVol > 1) mappedVol = 1;
-
-                // Frekans (Cutoff) Değişimi: Mesafe arttıkça filtre frekansı yükselir (Daha parlak ses)
-                let mappedFreq = Math.round(150 + (mappedVol * 3000));
-
-                // Arayüz Sürgülerini ve Değerlerini Güncelle
-                document.getElementById('slider-vol').value = mappedVol.toFixed(2);
-                document.getElementById('slider-freq').value = mappedFreq;
-                
-                document.getElementById('val-synth-vol').innerText = `${Math.round(mappedVol * 100)}%`;
-                document.getElementById('val-synth-freq').innerText = `${mappedFreq} Hz`;
-
-                document.getElementById('ai-dist-readout').innerText = `El Mesafesi: %${Math.round(mappedVol * 100)}`;
-
-                if (isPlayingSynth) {
-                    masterGain.gain.setValueAtTime(mappedVol * 0.5, audioCtx.currentTime); // Kulak sağlığı için max 0.5 volume limiti
-                    filterNode.frequency.setValueAtTime(mappedFreq, audioCtx.currentTime);
-                }
-
-                document.getElementById('audio-status-log').innerHTML = `<span class='text-amber-400'>[AI KONTROL]: Filtre Frekansı: ${mappedFreq}Hz / Ses: %${Math.round(mappedVol*100)}</span>`;
-            } else {
-                document.getElementById('audio-status-log').innerHTML = "<span class='text-red-400'>[AI HATA]: El Bekleniyor... Kameraya elinizi gösterin.</span>";
-            }
-        }
-
-        // AI Ses Modunu Aç/Kapat
-        function toggleAISynth() {
-            const btn = document.getElementById('btn-ai-toggle');
-            const readout = document.getElementById('ai-dist-readout');
-
-            if (isAISynthActive) {
-                isAISynthActive = false;
-                audioVideo.style.opacity = '0';
-                btn.className = "w-full border-2 border-emerald-500/30 text-emerald-400 hover:border-emerald-400 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2";
-                document.getElementById('ai-toggle-text').innerText = "Yapay Zeka (AI) El Kontrolü: PASİF";
-                readout.classList.add('hidden');
-            } else {
-                isAISynthActive = true;
-                audioVideo.style.opacity = '1';
-                btn.className = "w-full bg-emerald-950 text-emerald-400 border border-emerald-500 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20";
-                document.getElementById('ai-toggle-text').innerText = "Yapay Zeka (AI) El Kontrolü: AKTİF";
-                readout.classList.remove('hidden');
-
-                // MediaPipe El Takiplerini AI Audio Fonksiyonuna Bağla
-                mpHandsInstance.onResults(onAudioResults);
-
-                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                    audioVideo.srcObject = stream;
-                }).catch(err => {
-                    alert("Kamera başlatılamadı, lütfen izin verdiğinizden emin olun!");
+                // Color variations of purple rocks
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0x3b0764,
+                    flatShading: true,
+                    shininess: 30
                 });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                
+                // Random positioning around starting point
+                mesh.position.set(
+                    (Math.random() - 0.5) * 800,
+                    (Math.random() - 0.5) * 800,
+                    (Math.random() - 0.5) * 800
+                );
+
+                // Spin orientation speed
+                mesh.userData = {
+                    spinX: (Math.random() - 0.5) * 0.02,
+                    spinY: (Math.random() - 0.5) * 0.02
+                };
+
+                spaceScene.add(mesh);
+                spaceAsteroids.push(mesh);
+            }
+
+            // Window resize adjustment
+            window.addEventListener('resize', onSpaceWindowResize);
+
+            // Start loop
+            animateSpace();
+        }
+
+        // Flight controller keyboard handlers
+        function onSpaceKeyDown(e) {
+            switch (e.code) {
+                case 'ArrowUp':
+                case 'KeyW':
+                    moveForward = true;
+                    break;
+                case 'ArrowLeft':
+                case 'KeyA':
+                    moveLeft = true;
+                    break;
+                case 'ArrowDown':
+                case 'KeyS':
+                    moveBackward = true;
+                    break;
+                case 'ArrowRight':
+                case 'KeyD':
+                    moveRight = true;
+                    break;
+                case 'ShiftLeft':
+                case 'ShiftRight':
+                    speedBoost = true;
+                    break;
             }
         }
 
-        // AI Audio Laboratuvarını Aç
-        function startAudioLab() {
-            document.getElementById('portfolio-view').classList.add('hidden');
-            document.getElementById('audio-view').style.display = 'flex';
+        function onSpaceKeyUp(e) {
+            switch (e.code) {
+                case 'ArrowUp':
+                case 'KeyW':
+                    moveForward = false;
+                    break;
+                case 'ArrowLeft':
+                case 'KeyA':
+                    moveLeft = false;
+                    break;
+                case 'ArrowDown':
+                case 'KeyS':
+                    moveBackward = false;
+                    break;
+                case 'ArrowRight':
+                case 'KeyD':
+                    moveRight = false;
+                    break;
+                case 'ShiftLeft':
+                case 'ShiftRight':
+                    speedBoost = false;
+                    break;
+            }
         }
 
-        // Laboratuvarı Kapat
-        function stopAudioLab() {
-            stopSynth();
-            if (isAISynthActive) toggleAISynth(); // Kamera/AI aktifse kapat
+        function onSpaceMouseMove(e) {
+            let halfWidth = window.innerWidth / 2;
+            let halfHeight = window.innerHeight / 2;
+
+            // Normalize look offset
+            mouseLookX = (e.clientX - halfWidth) / halfWidth;
+            mouseLookY = (e.clientY - halfHeight) / halfHeight;
+
+            // Target angles
+            targetRotationY = -mouseLookX * 1.2; // Pan side to side
+            targetRotationX = -mouseLookY * 0.8; // Pitch up/down
+        }
+
+        function onSpaceWindowResize() {
+            if (!isSpaceActive || !spaceCamera || !spaceRenderer) return;
+            const container = document.getElementById("space3DCanvasHolder");
+            const width = container.clientWidth;
+            const height = container.clientHeight || 500;
+            spaceCamera.aspect = width / height;
+            spaceCamera.updateProjectionMatrix();
+            spaceRenderer.setSize(width, height);
+        }
+
+        // Animation Redraw Frame Loop
+        function animateSpace() {
+            if (!isSpaceActive) return;
+            requestAnimationFrame(animateSpace);
+
+            const delta = spaceClock.getDelta();
+
+            // Smoothly lerp camera pitch & yaw rotation toward target mouse orientation
+            spaceCamera.rotation.y += (targetRotationY - spaceCamera.rotation.y) * 0.1;
+            spaceCamera.rotation.x += (targetRotationX - spaceCamera.rotation.x) * 0.1;
+
+            // Sadece z ekseninde dönmesini engellemek için rulo kilidi (gimbal lock protection)
+            spaceCamera.rotation.z = 0;
+
+            // Determine local movement velocities depending on direction key state
+            spaceDirection.z = Number(moveBackward) - Number(moveForward);
+            spaceDirection.x = Number(moveRight) - Number(moveLeft);
+            spaceDirection.normalize(); // Ensure uniform vectors
+
+            // Base Speed factors
+            let currentBaseSpeed = speedBoost ? 300 : 100;
             
-            if (audioVideo.srcObject) {
-                audioVideo.srcObject.getTracks().forEach(track => track.stop());
-                audioVideo.srcObject = null;
+            // Warp Engine Speed Telemetry text
+            document.getElementById("spaceSpeed").innerText = speedBoost ? "WARP: 3x (BOOST)" : "WARP: 1x";
+
+            // Dampening friction vectors
+            spaceVelocity.z -= spaceVelocity.z * 10.0 * delta;
+            spaceVelocity.x -= spaceVelocity.x * 10.0 * delta;
+
+            if (moveForward || moveBackward) spaceVelocity.z += spaceDirection.z * currentBaseSpeed * delta;
+            if (moveLeft || moveRight) spaceVelocity.x += spaceDirection.x * currentBaseSpeed * delta;
+
+            // Translate space camera locally forward/backward/left/right in space
+            spaceCamera.translateZ(spaceVelocity.z);
+            spaceCamera.translateX(spaceVelocity.x);
+
+            // Spin all Asteroids slightly
+            spaceAsteroids.forEach(ast => {
+                ast.rotation.x += ast.userData.spinX;
+                ast.rotation.y += ast.userData.spinY;
+                
+                // Infinite bounding box looping logic (respawn behind camera when passed by miles)
+                let relDist = spaceCamera.position.distanceTo(ast.position);
+                if (relDist > 1000) {
+                    // Reposition in front of camera path
+                    const direction = new THREE.Vector3(0, 0, -1).applyQuaternion(spaceCamera.quaternion);
+                    ast.position.copy(spaceCamera.position).addScaledVector(direction, 600 + Math.random() * 200);
+                    ast.position.x += (Math.random() - 0.5) * 300;
+                    ast.position.y += (Math.random() - 0.5) * 300;
+                }
+            });
+
+            // Twinkle Star Points gently by subtle rotation
+            if (spaceStars) {
+                spaceStars.rotation.y += 0.0004;
             }
 
-            document.getElementById('audio-view').style.display = 'none';
-            document.getElementById('portfolio-view').classList.remove('hidden');
+            // Render
+            spaceRenderer.render(spaceScene, spaceCamera);
         }
     </script>
 </body>
