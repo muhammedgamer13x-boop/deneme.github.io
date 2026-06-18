@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhammed Gazi | Portfolio, Games & Air Draw</title>
+    <title>Muhammed Gazi | Portfolio, Games & AI Audio Lab</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -185,6 +185,24 @@
             background-color: #020617;
             overflow: hidden;
             user-select: none;
+            cursor: none; /* Oyunda imleç gizlensin */
+        }
+        /* Çıkış butonunun üstüne gelince imleç geri gelsin */
+        #game-view button {
+            cursor: auto;
+        }
+
+        /* --- AI AUDIO LAB CSS AYARLARI --- */
+        #audio-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9997;
+            background-color: #050510;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -277,20 +295,20 @@
                     </button>
                 </div>
 
-                <!-- Proje 3 (PYTHON SES KONTROLÜ) -->
-                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex flex-col justify-between hover:border-cyan-500/30 transition">
+                <!-- Proje 3 (AI GESTURE AUDIO LAB - YENİ HARİKA PROJEMİZ) -->
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg hover:border-emerald-500/50 flex flex-col justify-between group transition-all duration-300">
                     <div>
-                        <div class="w-12 h-12 bg-blue-950 border border-blue-400 rounded-xl flex items-center justify-center mb-4 text-blue-400 text-xl">
-                            <i class="fa-brands fa-python"></i>
+                        <div class="w-12 h-12 bg-emerald-950 border border-emerald-400 rounded-xl flex items-center justify-center mb-4 text-emerald-400 text-xl shadow-md">
+                            <i class="fa-solid fa-music"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-2 text-cyan-300">AI Gesture Volume Control</h3>
+                        <h3 class="text-xl font-bold mb-2 text-emerald-300">AI Audio Lab & Synth</h3>
                         <p class="text-gray-400 text-sm mb-6">
-                            Python, OpenCV ve MediaPipe kullanarak el parmaklarınızın arasındaki mesafeye göre bilgisayarınızın ses seviyesini havadan kontrol eden akıllı Python yazılımı.
+                            Gelişmiş Web Audio sentezleyicisi ve el takip kamerasıyla, havada parmaklarını yaklaştırıp uzaklaştırarak müziğin sesini ve ses dalgası frekansını kontrol edebileceğin harika müzik laboratuvarı!
                         </p>
                     </div>
-                    <!-- Kodu İncele Butonu -->
-                    <button onclick="openPythonModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-code"></i> Python Kodunu Al
+                    <!-- Çalıştırma Butonu -->
+                    <button onclick="startAudioLab()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-sliders"></i> Laboratuvarı Aç
                     </button>
                 </div>
 
@@ -392,20 +410,20 @@
                     <h1 class="text-2xl font-black hud-font tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-pink-500">CYBER_BREAKOUT v1.0</h1>
                 </div>
                 <!-- Çıkış Butonu -->
-                <button onclick="stopArcadeGame()" class="border border-rose-500 text-rose-500 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-rose-500 hover:text-white transition flex items-center gap-2">
+                <button onclick="stopArcadeGame()" class="border border-rose-500 text-rose-500 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-rose-500 hover:text-white transition flex items-center gap-2 z-[99999]">
                     <i class="fa-solid fa-circle-xmark"></i> OYUNDAN ÇIK
                 </button>
             </div>
 
             <!-- Oyun Tuvali (Canvas) -->
             <div class="relative border-4 border-fuchsia-500/60 rounded-2xl overflow-hidden shadow-2xl shadow-fuchsia-500/20 bg-slate-950">
-                <canvas id="game-canvas" width="800" height="500" class="block max-w-full cursor-none"></canvas>
+                <canvas id="game-canvas" width="800" height="500" class="block max-w-full"></canvas>
             </div>
 
             <!-- Oyun Alt Bilgisi / Kontroller -->
             <div class="w-full flex flex-col md:flex-row justify-between items-center mt-4 text-xs font-semibold text-gray-400 bg-slate-900/50 p-4 border border-gray-800 rounded-xl gap-3">
                 <div class="flex items-center gap-4">
-                    <span class="flex items-center gap-1.5"><kbd class="bg-gray-800 px-2 py-0.5 rounded text-white border border-gray-700">FARE / PARMAK</kbd> Paleti Hareket Ettir</span>
+                    <span class="flex items-center gap-1.5"><kbd class="bg-gray-800 px-2 py-0.5 rounded text-white border border-gray-700">FARE HAREKETİ</kbd> Paleti Yönlendir</span>
                     <span class="flex items-center gap-1.5"><kbd class="bg-gray-800 px-2 py-0.5 rounded text-white border border-gray-700">SOL TIK</kbd> Topu Fırlat / Lazer Ateşle</span>
                 </div>
                 <div class="flex items-center gap-3">
@@ -413,6 +431,88 @@
                     <span class="text-rose-400 font-bold">🔴 Lazer Palet</span>
                     <span class="text-purple-400 font-bold">🟣 Ekstra Top</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== AI GESTURE AUDIO LAB GÖRÜNÜMÜ ==================== -->
+    <div id="audio-view" class="flex flex-col items-center justify-center">
+        <!-- Neon Grid Arka Planı -->
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(16,185,129,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(16,185,129,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none"></div>
+
+        <!-- Kamera Katmanı (Küçük fütüristik ekran) -->
+        <video id="audio-webcam" class="absolute top-6 right-6 w-48 h-36 border border-emerald-500/40 rounded-xl bg-black object-cover transform scaleX(-1) opacity-0 transition-opacity duration-500 z-50 shadow-lg shadow-emerald-500/10" autoplay playsinline></video>
+
+        <div class="relative z-10 w-full max-w-5xl px-6 py-4 flex flex-col h-[90vh] justify-between">
+            <!-- Header -->
+            <div class="flex justify-between items-center border-b border-emerald-500/30 pb-4">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-wave-square text-3xl text-emerald-400 animate-pulse"></i>
+                    <div>
+                        <h1 class="text-xl font-bold hud-font tracking-wider text-emerald-300">AI_AUDIO_LAB v2.0</h1>
+                        <p class="text-xs text-gray-400">Yapay Zeka Destekli Frekans Sentezleyici</p>
+                    </div>
+                </div>
+                <button onclick="stopAudioLab()" class="border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500 hover:text-gray-950 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2">
+                    ← PORTFOLYOYA DÖN
+                </button>
+            </div>
+
+            <!-- Main Panel Split -->
+            <div class="grid lg:grid-cols-3 gap-8 my-auto items-center">
+                <!-- Sol Taraf Kontroller -->
+                <div class="bg-gray-950/80 border border-emerald-500/20 p-6 rounded-2xl flex flex-col gap-6">
+                    <h3 class="font-bold text-gray-100 border-b border-gray-800 pb-2">🎛️ Manuel Kontroller</h3>
+                    
+                    <!-- Başlat / Durdur -->
+                    <button id="btn-synth-toggle" onclick="toggleSynthPlay()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-bold py-4 rounded-xl shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 text-lg">
+                        <i id="synth-play-icon" class="fa-solid fa-play"></i> <span id="synth-play-text">Sentezleyiciyi Çalıştır</span>
+                    </button>
+
+                    <!-- AI Modu Butonu -->
+                    <button id="btn-ai-toggle" onclick="toggleAISynth()" class="w-full border-2 border-emerald-500/30 text-emerald-400 hover:border-emerald-400 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-camera"></i> <span id="ai-toggle-text">Yapay Zeka (AI) El Kontrolü: PASİF</span>
+                    </button>
+
+                    <!-- Sürgüler -->
+                    <div class="space-y-4 text-xs font-semibold text-gray-400">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>SES SEVİYESİ</span>
+                                <span id="val-synth-vol">30%</span>
+                            </div>
+                            <input id="slider-vol" oninput="updateSynthParams()" type="range" min="0" max="1" step="0.05" value="0.3" class="w-full accent-emerald-400 bg-gray-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>FİLTRE FREKANSI (CUTOFF)</span>
+                                <span id="val-synth-freq">800 Hz</span>
+                            </div>
+                            <input id="slider-freq" oninput="updateSynthParams()" type="range" min="100" max="5000" step="50" value="800" class="w-full accent-emerald-400 bg-gray-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orta Taraf Dalga Görselleştiricisi -->
+                <div class="lg:col-span-2 bg-gray-950/80 border border-emerald-500/20 p-6 rounded-2xl flex flex-col justify-between h-[360px] relative overflow-hidden">
+                    <h3 class="font-bold text-emerald-400 mb-2 hud-font flex justify-between">
+                        <span>📊 SPEKTRUM ANALİZÖRÜ</span>
+                        <span id="ai-dist-readout" class="text-xs text-amber-400 hidden">Parmak Mesafesi: Ölçülüyor...</span>
+                    </h3>
+                    <canvas id="visualizer-canvas" class="w-full h-[220px] rounded-xl border border-emerald-500/10 bg-black/40"></canvas>
+                    <div class="text-center text-[11px] text-gray-500 font-mono mt-2">
+                        [DURUM]: <span id="audio-status-log" class="text-emerald-500">Müzik Bekliyor... Sentezleyiciyi çalıştırın.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Python Kod Butonu (Alt Kısım) -->
+            <div class="flex justify-between items-center bg-gray-900/30 border border-gray-800 p-4 rounded-xl text-xs text-gray-400">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-lightbulb text-emerald-400 text-sm"></i> AI Modu'nu açtıktan sonra elinin başparmağını ve işaret parmağını kameraya gösterip mesafeyi değiştirerek müziği şekillendir!</span>
+                <button onclick="openPythonModal()" class="bg-emerald-950 text-emerald-400 border border-emerald-500/30 px-4 py-2 rounded-xl font-bold hover:bg-emerald-500 hover:text-gray-950 transition">
+                    <i class="fa-brands fa-python"></i> Python Kodunu Al
+                </button>
             </div>
         </div>
     </div>
@@ -693,9 +793,9 @@ cv2.destroyAllWindows()</code></pre>
         }
 
         // MediaPipe Yapay Zeka Kurulumu
-        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-        hands.onResults(onResults);
+        const mpHandsInstance = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+        mpHandsInstance.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        mpHandsInstance.onResults(onResults);
 
         let cameraInstance = null;
 
@@ -706,9 +806,11 @@ cv2.destroyAllWindows()</code></pre>
             document.getElementById('loader').style.display = 'flex';
             resize();
 
+            mpHandsInstance.onResults(onResults); // Air Draw fonksiyonuna yönlendir
+
             if (!cameraInstance) {
                 cameraInstance = new Camera(video, {
-                    onFrame: async () => { await hands.send({image: video}); },
+                    onFrame: async () => { await mpHandsInstance.send({image: video}); },
                     width: 1280, height: 720
                 });
             }
@@ -863,11 +965,12 @@ cv2.destroyAllWindows()</code></pre>
             }
         }
 
-        // Fare ve Dokunmatik Kontrolleri
-        gameCanvas.addEventListener('mousemove', (e) => {
+        // --- İMLEÇ DUVARA ÇARPMA/DIŞARI KAÇMA HATASININ DÜZELTİLDİĞİ YER ---
+        // Mousemove artık sadece canvas içinde değil, tüm ekranda pürüzsüz takip ediyor
+        window.addEventListener('mousemove', (e) => {
+            if (!gameActive) return;
             const rect = gameCanvas.getBoundingClientRect();
-            const root = document.documentElement;
-            const mouseX = e.clientX - rect.left - root.scrollLeft;
+            const mouseX = e.clientX - rect.left;
             paddle.x = mouseX - paddle.width / 2;
             
             // Sınırlar
@@ -876,7 +979,8 @@ cv2.destroyAllWindows()</code></pre>
         });
 
         // Tıklama ile fırlatma ve ateş etme
-        gameCanvas.addEventListener('click', () => {
+        gameCanvas.addEventListener('mousedown', () => {
+            if (!gameActive) return;
             // Fırlatılmamış topları fırlat
             balls.forEach(ball => {
                 if (!ball.inPlay) {
@@ -1082,7 +1186,7 @@ cv2.destroyAllWindows()</code></pre>
                 if (part.alpha <= 0) particles.splice(index, 1);
             });
 
-            // Seviye Atlama Kontrolü (Tüm tuğlalar kırıldıysa)
+            // Seviye Atlama Kontrolü (Tüm tuğlar kırıldıysa)
             if (bricks.every(b => !b.active)) {
                 level++;
                 createBricks();
@@ -1209,6 +1313,252 @@ cv2.destroyAllWindows()</code></pre>
                 draw();
                 gameLoopId = requestAnimationFrame(gameLoop);
             }
+        }
+
+
+
+        // ==========================================
+        //         AI AUDIO LAB SİSTEM KODLARI
+        // ==========================================
+        let audioCtx = null;
+        let synthInterval = null;
+        let masterGain = null;
+        let filterNode = null;
+        let analyserNode = null;
+        let isPlayingSynth = false;
+        let isAISynthActive = false;
+        let audioVideo = document.getElementById('audio-webcam');
+
+        const audioCanvas = document.getElementById('visualizer-canvas');
+        const aCanvasCtx = audioCanvas.getContext('2d');
+        let drawVisualId = null;
+
+        // Fütüristik Synth Kodları
+        function startSynth() {
+            if (isPlayingSynth) return;
+            
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+
+            filterNode = audioCtx.createBiquadFilter();
+            filterNode.type = 'lowpass';
+            filterNode.frequency.setValueAtTime(800, audioCtx.currentTime);
+            filterNode.Q.setValueAtTime(4, audioCtx.currentTime);
+
+            analyserNode = audioCtx.createAnalyser();
+            analyserNode.fftSize = 128;
+
+            // Bağlantılar
+            filterNode.connect(analyserNode);
+            analyserNode.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+
+            let step = 0;
+            const bassline = [110, 110, 130, 110, 146, 110, 165, 130]; // Cyberpunk Bass Arpeggiator (A-C-D-E)
+
+            synthInterval = setInterval(() => {
+                if (!audioCtx) return;
+
+                // 1. Ana Bass Sesi
+                let osc = audioCtx.createOscillator();
+                let oscGain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(bassline[step % bassline.length] / 2, audioCtx.currentTime);
+                oscGain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+                oscGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
+                
+                osc.connect(oscGain);
+                oscGain.connect(filterNode);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+
+                // 2. Lead Melodi (4 Adımda bir tetiklenir)
+                if (step % 4 === 0) {
+                    let leadOsc = audioCtx.createOscillator();
+                    let leadGain = audioCtx.createGain();
+                    leadOsc.type = 'triangle';
+                    leadOsc.frequency.setValueAtTime(bassline[step % bassline.length] * 2, audioCtx.currentTime);
+                    leadGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    leadGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                    
+                    leadOsc.connect(leadGain);
+                    leadGain.connect(filterNode);
+                    leadOsc.start();
+                    leadOsc.stop(audioCtx.currentTime + 0.5);
+                }
+
+                step++;
+            }, 220); // 130 BPM temposunda
+
+            isPlayingSynth = true;
+            document.getElementById('synth-play-icon').className = "fa-solid fa-square";
+            document.getElementById('synth-play-text').innerText = "Sentezleyiciyi Durdur";
+            document.getElementById('audio-status-log').innerHTML = "<span class='text-emerald-400'>SENTEZLEYİCİ AKTİF - SES AKIŞI BAŞLADI</span>";
+            
+            visualizeSpectrum();
+        }
+
+        function stopSynth() {
+            if (!isPlayingSynth) return;
+            clearInterval(synthInterval);
+            cancelAnimationFrame(drawVisualId);
+            if (audioCtx) {
+                audioCtx.close();
+                audioCtx = null;
+            }
+            isPlayingSynth = false;
+            document.getElementById('synth-play-icon').className = "fa-solid fa-play";
+            document.getElementById('synth-play-text').innerText = "Sentezleyiciyi Çalıştır";
+            document.getElementById('audio-status-log').innerHTML = "<span class='text-gray-400'>Müzik Bekliyor... Sentezleyiciyi çalıştırın.</span>";
+        }
+
+        function toggleSynthPlay() {
+            if (isPlayingSynth) stopSynth();
+            else startSynth();
+        }
+
+        // Manuel Sürgü Güncellemeleri
+        function updateSynthParams() {
+            if (!isPlayingSynth) return;
+            
+            const vol = parseFloat(document.getElementById('slider-vol').value);
+            const freq = parseFloat(document.getElementById('slider-freq').value);
+
+            masterGain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            filterNode.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            document.getElementById('val-synth-vol').innerText = `${Math.round(vol * 100)}%`;
+            document.getElementById('val-synth-freq').innerText = `${freq} Hz`;
+        }
+
+        // Fütüristik Dalga Formu Çizimi
+        function visualizeSpectrum() {
+            if (!isPlayingSynth) return;
+
+            const bufferLength = analyserNode.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function drawWave() {
+                if (!isPlayingSynth) return;
+                drawVisualId = requestAnimationFrame(drawWave);
+
+                analyserNode.getByteFrequencyData(dataArray);
+
+                aCanvasCtx.fillStyle = 'rgba(5, 5, 16, 0.3)';
+                aCanvasCtx.fillRect(0, 0, audioCanvas.width, audioCanvas.height);
+
+                const barWidth = (audioCanvas.width / bufferLength) * 1.5;
+                let barHeight;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    barHeight = dataArray[i] * 0.8;
+
+                    // Neon Efekti
+                    aCanvasCtx.fillStyle = `rgba(16, 185, 129, ${barHeight / 150})`;
+                    aCanvasCtx.shadowBlur = 10;
+                    aCanvasCtx.shadowColor = '#10b981';
+                    aCanvasCtx.fillRect(x, audioCanvas.height - barHeight, barWidth - 2, barHeight);
+
+                    x += barWidth;
+                }
+                aCanvasCtx.shadowBlur = 0; // Gölge temizliği
+            }
+
+            audioCanvas.width = audioCanvas.parentNode.clientWidth;
+            audioCanvas.height = 220;
+            drawWave();
+        }
+
+        // AI Modu El Algılama Tetikleyicisi
+        function onAudioResults(results) {
+            if (!isAISynthActive) return;
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const hand = results.multiHandLandmarks[0];
+                
+                const thumb = hand[4];
+                const index = hand[8];
+
+                // Mesafe hesabı (X ve Y koordinatlarına göre hipotenüs)
+                const dist = Math.hypot(index.x - thumb.x, index.y - thumb.y);
+
+                // Mesafeyi Sürgü Limitlerine Dönüştürme (0.05 ile 0.45 arası el mesafesi)
+                let mappedVol = (dist - 0.05) / 0.40;
+                if (mappedVol < 0) mappedVol = 0;
+                if (mappedVol > 1) mappedVol = 1;
+
+                // Frekans (Cutoff) Değişimi: Mesafe arttıkça filtre frekansı yükselir (Daha parlak ses)
+                let mappedFreq = Math.round(150 + (mappedVol * 3000));
+
+                // Arayüz Sürgülerini ve Değerlerini Güncelle
+                document.getElementById('slider-vol').value = mappedVol.toFixed(2);
+                document.getElementById('slider-freq').value = mappedFreq;
+                
+                document.getElementById('val-synth-vol').innerText = `${Math.round(mappedVol * 100)}%`;
+                document.getElementById('val-synth-freq').innerText = `${mappedFreq} Hz`;
+
+                document.getElementById('ai-dist-readout').innerText = `El Mesafesi: %${Math.round(mappedVol * 100)}`;
+
+                if (isPlayingSynth) {
+                    masterGain.gain.setValueAtTime(mappedVol * 0.5, audioCtx.currentTime); // Kulak sağlığı için max 0.5 volume limiti
+                    filterNode.frequency.setValueAtTime(mappedFreq, audioCtx.currentTime);
+                }
+
+                document.getElementById('audio-status-log').innerHTML = `<span class='text-amber-400'>[AI KONTROL]: Filtre Frekansı: ${mappedFreq}Hz / Ses: %${Math.round(mappedVol*100)}</span>`;
+            } else {
+                document.getElementById('audio-status-log').innerHTML = "<span class='text-red-400'>[AI HATA]: El Bekleniyor... Kameraya elinizi gösterin.</span>";
+            }
+        }
+
+        // AI Ses Modunu Aç/Kapat
+        function toggleAISynth() {
+            const btn = document.getElementById('btn-ai-toggle');
+            const readout = document.getElementById('ai-dist-readout');
+
+            if (isAISynthActive) {
+                isAISynthActive = false;
+                audioVideo.style.opacity = '0';
+                btn.className = "w-full border-2 border-emerald-500/30 text-emerald-400 hover:border-emerald-400 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2";
+                document.getElementById('ai-toggle-text').innerText = "Yapay Zeka (AI) El Kontrolü: PASİF";
+                readout.classList.add('hidden');
+            } else {
+                isAISynthActive = true;
+                audioVideo.style.opacity = '1';
+                btn.className = "w-full bg-emerald-950 text-emerald-400 border border-emerald-500 font-bold py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20";
+                document.getElementById('ai-toggle-text').innerText = "Yapay Zeka (AI) El Kontrolü: AKTİF";
+                readout.classList.remove('hidden');
+
+                // MediaPipe El Takiplerini AI Audio Fonksiyonuna Bağla
+                mpHandsInstance.onResults(onAudioResults);
+
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    audioVideo.srcObject = stream;
+                }).catch(err => {
+                    alert("Kamera başlatılamadı, lütfen izin verdiğinizden emin olun!");
+                });
+            }
+        }
+
+        // AI Audio Laboratuvarını Aç
+        function startAudioLab() {
+            document.getElementById('portfolio-view').classList.add('hidden');
+            document.getElementById('audio-view').style.display = 'flex';
+        }
+
+        // Laboratuvarı Kapat
+        function stopAudioLab() {
+            stopSynth();
+            if (isAISynthActive) toggleAISynth(); // Kamera/AI aktifse kapat
+            
+            if (audioVideo.srcObject) {
+                audioVideo.srcObject.getTracks().forEach(track => track.stop());
+                audioVideo.srcObject = null;
+            }
+
+            document.getElementById('audio-view').style.display = 'none';
+            document.getElementById('portfolio-view').classList.remove('hidden');
         }
     </script>
 </body>
